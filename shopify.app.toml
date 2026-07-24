@@ -2,12 +2,11 @@
 
 client_id = "c48998eee38600bddc51556d6a25df10"
 name = "InvoiceKing"
-application_url = "https://shopify.dev/apps/default-app-home"
+application_url = "https://invoice-king-production.up.railway.app"
 embedded = true
 
 [build]
 automatically_update_urls_on_dev = true
-include_config_on_deploy = true
 
 [webhooks]
 api_version = "2026-10"
@@ -41,4 +40,4 @@ api_version = "2026-10"
 scopes = "read_orders,read_draft_orders,read_customers,read_products,read_locales"
 
 [auth]
-redirect_urls = [ "https://shopify.dev/apps/default-app-home/api/auth" ]
+redirect_urls = [ "https://invoice-king-production.up.railway.app/auth/callback", "https://invoice-king-production.up.railway.app/auth/shopify/callback", "https://invoice-king-production.up.railway.app/api/auth/callback" ]
