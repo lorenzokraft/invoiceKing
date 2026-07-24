@@ -1,14 +1,49 @@
-api_version = "2024-10"
+[[extensions]]
+type = "admin_link"
+name = "Print Invoice"
+handle = "print-invoice"
+uid = "5182661c-3325-781a-d0b8-cff9b4a389ee829869bc"
+
+[[extensions.targeting]]
+target = "admin.order-details.action.link"
+url = "/api/documents/print?type=invoice"
 
 [[extensions]]
-type = "admin_action"
-name = "order-document-actions"
-handle = "order-document-actions"
+type = "admin_link"
+name = "Print Packing Slip"
+handle = "print-packing-slip"
+uid = "7260c552-22f1-3cb4-36a3-ec02dd19273f62388599"
 
 [[extensions.targeting]]
-target = "admin.order-index.action.render"
-module = "./src/ActionExtension.tsx"
+target = "admin.order-details.action.link"
+url = "/api/documents/print?type=packing-slip"
+
+[[extensions]]
+type = "admin_link"
+name = "Download Invoice"
+handle = "download-invoice"
+uid = "afec8dd3-0285-df29-2cbf-c6e53c7e05c6dabf160d"
 
 [[extensions.targeting]]
-target = "admin.order-details.action.render"
-module = "./src/ActionExtension.tsx"
+target = "admin.order-details.action.link"
+url = "/api/documents/download?type=invoice"
+
+[[extensions]]
+type = "admin_link"
+name = "Download Packing Slip"
+handle = "download-packing-slip"
+uid = "91a5905d-40ab-0d5c-6a18-008c52928e566e8c2557"
+
+[[extensions.targeting]]
+target = "admin.order-details.action.link"
+url = "/api/documents/download?type=packing-slip"
+
+[[extensions]]
+type = "admin_link"
+name = "Send Invoice"
+handle = "send-invoice"
+uid = "8ef111cd-9788-f3cd-9e9c-fcc17b0539f5b9629525"
+
+[[extensions.targeting]]
+target = "admin.order-details.action.link"
+url = "/api/documents/send?type=invoice"
