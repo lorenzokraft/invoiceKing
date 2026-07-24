@@ -1,0 +1,14 @@
+api_version = "2024-10"
+
+[[extensions]]
+type = "admin_action"
+name = "order-document-actions"
+handle = "order-document-actions"
+
+[[extensions.targeting]]
+target = "admin.order-index.action.render"
+module = "./src/ActionExtension.tsx"
+
+[[extensions.targeting]]
+target = "admin.order-details.action.render"
+module = "./src/ActionExtension.tsx"
