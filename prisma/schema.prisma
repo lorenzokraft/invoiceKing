@@ -1,0 +1,153 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Note that some adapters may set a maximum length for the String type by default, please ensure your strings are long
+// enough when changing adapters.
+// See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id                  String    @id
+  shop                String
+  state               String
+  isOnline            Boolean   @default(false)
+  scope               String?
+  expires             DateTime?
+  accessToken         String
+  userId              BigInt?
+  firstName           String?
+  lastName            String?
+  email               String?
+  accountOwner        Boolean   @default(false)
+  locale              String?
+  collaborator        Boolean?  @default(false)
+  emailVerified       Boolean?  @default(false)
+  refreshToken        String?
+  refreshTokenExpires DateTime?
+}
+
+enum DocumentType {
+  INVOICE
+  DRAFT
+  PACKING_SLIP
+  CREDIT_NOTE
+  RETURN_FORM
+  RECEIPT
+  QUOTE
+}
+
+enum DocumentStatus {
+  OPEN
+  COMPLETED
+  SENT
+  VOID
+}
+
+enum PlanTier {
+  FREE
+  BASIC
+  PRO
+  PREMIUM
+}
+
+model ShopSettings {
+  id                  String   @id @default(cuid())
+  shop                String   @unique
+  // Company details shown on documents
+  storeName           String?
+  storeUrl            String?
+  email               String?
+  phone               String?
+  taxNumber           String?
+  address             String?
+  // Unit settings
+  addressFormat       String   @default("United Arab Emirates")
+  dateFormat          String   @default("d MMMM, yyyy")
+  timeFormat          String   @default("none")
+  currencyFormat      String   @default("{currency_symbol} {price_with_dot}")
+  priceDecimals       Int      @default(2)
+  // Localization
+  primaryLocale       String   @default("en")
+  additionalLocales   String[] @default([])
+  // Currency behavior: store currency vs customer (presentment) currency
+  useCustomerCurrency Boolean  @default(false)
+  // Credit note automation
+  creditNoteOnCancel        Boolean @default(false)
+  creditNoteOnFullRefund    Boolean @default(false)
+  creditNoteOnPartialRefund Boolean @default(false)
+  // Invoice numbering
+  invoicePrefix       String   @default("INV-")
+  nextInvoiceNumber   Int      @default(1)
+  // Billing
+  planTier            PlanTier @default(FREE)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  documents Document[]
+  templates Template[]
+  usage     MonthlyUsage[]
+}
+
+model Document {
+  id             String         @id @default(cuid())
+  shop           String
+  type           DocumentType
+  status         DocumentStatus @default(OPEN)
+  number         String
+  // Shopify references
+  orderId        String?
+  orderName      String?
+  draftOrderId   String?
+  customerName   String?
+  customerEmail  String?
+  currency       String
+  totalAmount    Decimal        @db.Decimal(12, 2)
+  locale         String         @default("en")
+  // Snapshot of rendered data (line items, taxes, addresses) at generation time
+  payload        Json
+  pdfUrl         String?
+  sentAt         DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  settings ShopSettings @relation(fields: [shop], references: [shop])
+
+  @@index([shop, type])
+  @@index([shop, orderId])
+}
+
+model Template {
+  id        String       @id @default(cuid())
+  shop      String
+  type      DocumentType
+  name      String
+  isDefault Boolean      @default(false)
+  // Template definition (layout options, colors, logo url, custom fields)
+  config    Json
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  settings ShopSettings @relation(fields: [shop], references: [shop])
+
+  @@index([shop, type])
+}
+
+model MonthlyUsage {
+  id           String   @id @default(cuid())
+  shop         String
+  // First day of the usage month, UTC
+  periodStart  DateTime
+  invoiceCount Int      @default(0)
+  updatedAt    DateTime @updatedAt
+
+  settings ShopSettings @relation(fields: [shop], references: [shop])
+
+  @@unique([shop, periodStart])
+}
