@@ -12,6 +12,7 @@ import {
   ButtonGroup,
   TextField,
   Pagination,
+  Banner,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
@@ -23,26 +24,40 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const cursor = url.searchParams.get("cursor");
   const searchQuery = url.searchParams.get("q") || "";
 
-  const response = await admin.graphql(ORDERS_QUERY, {
-    variables: {
-      first: 50,
-      after: cursor,
-      query: searchQuery,
-    },
-  });
+  try {
+    const response = await admin.graphql(ORDERS_QUERY, {
+      variables: {
+        first: 50,
+        after: cursor,
+        query: searchQuery,
+      },
+    });
 
-  const data = await response.json();
-  const orders = data.data?.orders?.edges || [];
-  const pageInfo = data.data?.orders?.pageInfo || {
-    hasNextPage: false,
-    hasPreviousPage: false,
-  };
+    const data = await response.json();
+    const orders = data.data?.orders?.edges || [];
+    const pageInfo = data.data?.orders?.pageInfo || {
+      hasNextPage: false,
+      hasPreviousPage: false,
+    };
 
-  return json({ orders, pageInfo, searchQuery });
+    return json({ orders, pageInfo, searchQuery, error: null });
+  } catch (error: any) {
+    const message: string = error?.message || "Failed to load orders";
+    console.error("Orders loader error:", message);
+
+    return json({
+      orders: [],
+      pageInfo: { hasNextPage: false, hasPreviousPage: false },
+      searchQuery,
+      error: message.includes("not approved to access")
+        ? "This app needs Protected Customer Data access approval to read orders. Enable it in the Shopify dev dashboard under API access."
+        : message,
+    });
+  }
 };
 
 export default function OrdersPage() {
-  const { orders, pageInfo } = useLoaderData<typeof loader>();
+  const { orders, pageInfo, error } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
   const searchQuery = searchParams.get("q") || "";
 
@@ -123,6 +138,13 @@ export default function OrdersPage() {
   return (
     <Page fullWidth>
       <TitleBar title="Orders" />
+      {error && (
+        <div style={{ marginBottom: "16px" }}>
+          <Banner tone="critical" title="Unable to load orders">
+            <p>{error}</p>
+          </Banner>
+        </div>
+      )}
       <Card padding="0">
         <div style={{ padding: "16px 16px 0" }}>
           <TextField
