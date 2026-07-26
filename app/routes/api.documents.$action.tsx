@@ -2,6 +2,10 @@ import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { renderToStream } from "@react-pdf/renderer";
 import { authenticate } from "../shopify.server";
 import { InvoiceTemplate, PackingSlipTemplate } from "../lib/pdf-templates";
+import db from "../db.server";
+import { DocumentType, DocumentStatus } from "@prisma/client";
+
+const FREE_PLAN_MONTHLY_LIMIT = 50;
 
 const ORDER_QUERY = `#graphql
   query GetOrder($id: ID!) {
@@ -93,8 +97,83 @@ async function fetchOrderData(admin: any, orderId: string) {
   };
 }
 
+async function checkUsageLimit(shop: string) {
+  const settings = await db.shopSettings.findUnique({ where: { shop } });
+  if (!settings || settings.planTier !== "FREE") {
+    return { allowed: true, usage: 0, limit: 0 };
+  }
+
+  const now = new Date();
+  const periodStart = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1),
+  );
+
+  const usage = await db.monthlyUsage.upsert({
+    where: { shop_periodStart: { shop, periodStart } },
+    update: {},
+    create: { shop, periodStart, invoiceCount: 0 },
+  });
+
+  return {
+    allowed: usage.invoiceCount < FREE_PLAN_MONTHLY_LIMIT,
+    usage: usage.invoiceCount,
+    limit: FREE_PLAN_MONTHLY_LIMIT,
+  };
+}
+
+async function trackDocument(
+  shop: string,
+  orderId: string,
+  orderName: string,
+  type: DocumentType,
+  status: DocumentStatus,
+  customerName: string,
+  customerEmail: string,
+  currency: string,
+  totalAmount: string,
+) {
+  const settings = await db.shopSettings.findUnique({ where: { shop } });
+  const nextNumber = settings?.nextInvoiceNumber || 1;
+  const prefix = settings?.invoicePrefix || "INV-";
+  const documentNumber = `${prefix}${nextNumber.toString().padStart(4, "0")}`;
+
+  await db.document.create({
+    data: {
+      shop,
+      type,
+      status,
+      number: documentNumber,
+      orderId,
+      orderName,
+      customerName,
+      customerEmail,
+      currency,
+      totalAmount,
+      payload: {},
+      sentAt: status === "SENT" ? new Date() : null,
+    },
+  });
+
+  await db.shopSettings.update({
+    where: { shop },
+    data: { nextInvoiceNumber: nextNumber + 1 },
+  });
+
+  const now = new Date();
+  const periodStart = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1),
+  );
+
+  await db.monthlyUsage.upsert({
+    where: { shop_periodStart: { shop, periodStart } },
+    update: { invoiceCount: { increment: 1 } },
+    create: { shop, periodStart, invoiceCount: 1 },
+  });
+}
+
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-  const { admin } = await authenticate.admin(request);
+  const { admin, session } = await authenticate.admin(request);
+  const shop = session.shop;
   const action = params.action;
   const url = new URL(request.url);
   let orderId = url.searchParams.get("id") || url.searchParams.get("orderId");
@@ -104,12 +183,43 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     return new Response("Missing parameters", { status: 400 });
   }
 
-  // Convert numeric ID to GID if needed
+  const usageCheck = await checkUsageLimit(shop);
+  if (!usageCheck.allowed) {
+    return new Response(
+      `<html><body style="font-family: sans-serif; padding: 40px; text-align: center;">
+        <h1>Monthly Limit Reached</h1>
+        <p>You've used ${usageCheck.usage} of ${usageCheck.limit} free invoices this month.</p>
+        <p><a href="/app/plans" style="color: #008060; text-decoration: none; font-weight: bold;">Upgrade your plan</a> for unlimited invoices.</p>
+      </body></html>`,
+      {
+        status: 403,
+        headers: { "Content-Type": "text/html" },
+      },
+    );
+  }
+
   if (!orderId.startsWith("gid://")) {
     orderId = `gid://shopify/Order/${orderId}`;
   }
 
   const orderData = await fetchOrderData(admin, orderId);
+
+  const documentType: DocumentType =
+    type === "invoice" ? "INVOICE" : "PACKING_SLIP";
+  const documentStatus: DocumentStatus =
+    action === "print" ? "COMPLETED" : "OPEN";
+
+  await trackDocument(
+    shop,
+    orderId,
+    orderData.orderNumber,
+    documentType,
+    documentStatus,
+    orderData.customer.name,
+    orderData.customer.email,
+    orderData.currency,
+    orderData.total,
+  );
 
   const Template =
     type === "invoice" ? InvoiceTemplate : PackingSlipTemplate;
@@ -135,6 +245,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
 export const action = async ({ request, params }: ActionFunctionArgs) => {
   const { admin, session } = await authenticate.admin(request);
+  const shop = session.shop;
   const actionType = params.action;
   const url = new URL(request.url);
   let orderId = url.searchParams.get("id") || url.searchParams.get("orderId");
@@ -144,15 +255,38 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
     return new Response("Invalid action", { status: 400 });
   }
 
-  // Convert numeric ID to GID if needed
+  const usageCheck = await checkUsageLimit(shop);
+  if (!usageCheck.allowed) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: `Monthly limit reached (${usageCheck.usage}/${usageCheck.limit}). Upgrade your plan for unlimited invoices.`,
+      }),
+      {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  }
+
   if (!orderId.startsWith("gid://")) {
     orderId = `gid://shopify/Order/${orderId}`;
   }
 
   const orderData = await fetchOrderData(admin, orderId);
 
-  // TODO: Send email with invoice PDF attached
-  // For now, just return success
+  await trackDocument(
+    shop,
+    orderId,
+    orderData.orderNumber,
+    "INVOICE",
+    "SENT",
+    orderData.customer.name,
+    orderData.customer.email,
+    orderData.currency,
+    orderData.total,
+  );
+
   console.log(`Sending invoice for order ${orderData.orderNumber} to ${orderData.customer.email}`);
 
   return new Response(JSON.stringify({ success: true }), {

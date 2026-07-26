@@ -145,8 +145,13 @@ export default function DraftsPage() {
             onClick={async () => {
               const url = `/api/documents/send?type=invoice&orderId=${encodeURIComponent(node.id)}`;
               try {
-                await fetch(url, { method: "POST" });
-                shopify.toast.show("Invoice sent successfully");
+                const response = await fetch(url, { method: "POST" });
+                const data = await response.json();
+                if (response.ok) {
+                  shopify.toast.show("Invoice sent successfully");
+                } else {
+                  shopify.toast.show(data.error || "Failed to send invoice");
+                }
               } catch (err) {
                 shopify.toast.show("Failed to send invoice");
               }
