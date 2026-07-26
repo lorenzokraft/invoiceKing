@@ -447,17 +447,17 @@ export default function TemplatesPage() {
                   />
                   <Checkbox
                     label="Display Order No"
-                    checked={formData.displayOrderNo}
+                    checked={!!formData.displayOrderNo}
                     onChange={(value) => setFormData((prev) => ({ ...prev, displayOrderNo: value }))}
                   />
                   <Checkbox
                     label="Display Invoice No"
-                    checked={formData.displayInvoiceNo}
+                    checked={!!formData.displayInvoiceNo}
                     onChange={(value) => setFormData((prev) => ({ ...prev, displayInvoiceNo: value }))}
                   />
                   <Checkbox
                     label="Display Order Date"
-                    checked={formData.displayOrderDate}
+                    checked={!!formData.displayOrderDate}
                     onChange={(value) => setFormData((prev) => ({ ...prev, displayOrderDate: value }))}
                   />
                   <TextField
@@ -514,19 +514,39 @@ export default function TemplatesPage() {
         <div style={{ flex: 1 }}>
           <Card>
             <BlockStack gap="400">
-              <InlineStack align="space-between">
+              <InlineStack align="space-between" blockAlign="center">
                 <InlineStack gap="200">
                   <Button icon={PrintIcon}>Print</Button>
                   <Button icon={ImportIcon}>Download</Button>
                   <Button icon={EmailIcon}>Send</Button>
                 </InlineStack>
-                <Select
-                  label="Template"
-                  labelHidden
-                  options={templateOptions}
-                  value={templateType}
-                  onChange={(value) => setTemplateType(value)}
-                />
+                <InlineStack gap="200" blockAlign="center">
+                  <Text as="p" variant="bodyMd">
+                    Template
+                  </Text>
+                  <div style={{ minWidth: "180px" }}>
+                    <Select
+                      label="Template"
+                      labelHidden
+                      options={templateOptions}
+                      value={templateType}
+                      onChange={(value) => {
+                        setTemplateType(value);
+                        const titles: Record<string, string> = {
+                          invoice: "INVOICE",
+                          draft: "DRAFT",
+                          credit_note: "CREDIT NOTE",
+                          packing_slip: "PACKING SLIP",
+                          return_form: "RETURN FORM",
+                        };
+                        setFormData((prev) => ({
+                          ...prev,
+                          documentTitle: titles[value] || "INVOICE",
+                        }));
+                      }}
+                    />
+                  </div>
+                </InlineStack>
               </InlineStack>
 
               <div
