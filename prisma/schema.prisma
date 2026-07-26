@@ -67,6 +67,7 @@ model ShopSettings {
   phone               String?
   taxNumber           String?
   address             String?
+  logoUrl             String?
   // Unit settings
   addressFormat       String   @default("United Arab Emirates")
   dateFormat          String   @default("d MMMM, yyyy")
