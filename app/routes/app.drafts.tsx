@@ -119,9 +119,41 @@ export default function DraftsPage() {
       </IndexTable.Cell>
       <IndexTable.Cell>
         <ButtonGroup>
-          <Button size="slim" icon={PrintIcon}>Print</Button>
-          <Button size="slim" icon={ImportIcon}>Download</Button>
-          <Button size="slim" icon={EmailIcon}>Send</Button>
+          <Button
+            size="slim"
+            icon={PrintIcon}
+            onClick={() => {
+              const url = `/api/documents/print?type=invoice&orderId=${encodeURIComponent(node.id)}`;
+              window.open(url, "_blank");
+            }}
+          >
+            Print
+          </Button>
+          <Button
+            size="slim"
+            icon={ImportIcon}
+            onClick={() => {
+              const url = `/api/documents/download?type=invoice&orderId=${encodeURIComponent(node.id)}`;
+              window.open(url, "_blank");
+            }}
+          >
+            Download
+          </Button>
+          <Button
+            size="slim"
+            icon={EmailIcon}
+            onClick={async () => {
+              const url = `/api/documents/send?type=invoice&orderId=${encodeURIComponent(node.id)}`;
+              try {
+                await fetch(url, { method: "POST" });
+                shopify.toast.show("Invoice sent successfully");
+              } catch (err) {
+                shopify.toast.show("Failed to send invoice");
+              }
+            }}
+          >
+            Send
+          </Button>
         </ButtonGroup>
       </IndexTable.Cell>
     </IndexTable.Row>
