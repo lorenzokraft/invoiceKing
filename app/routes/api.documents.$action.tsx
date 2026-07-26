@@ -97,11 +97,16 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const { admin } = await authenticate.admin(request);
   const action = params.action;
   const url = new URL(request.url);
-  const orderId = url.searchParams.get("orderId");
+  let orderId = url.searchParams.get("id") || url.searchParams.get("orderId");
   const type = url.searchParams.get("type");
 
   if (!orderId || !type || !action) {
     return new Response("Missing parameters", { status: 400 });
+  }
+
+  // Convert numeric ID to GID if needed
+  if (!orderId.startsWith("gid://")) {
+    orderId = `gid://shopify/Order/${orderId}`;
   }
 
   const orderData = await fetchOrderData(admin, orderId);
@@ -132,11 +137,16 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
   const { admin, session } = await authenticate.admin(request);
   const actionType = params.action;
   const url = new URL(request.url);
-  const orderId = url.searchParams.get("orderId");
+  let orderId = url.searchParams.get("id") || url.searchParams.get("orderId");
   const type = url.searchParams.get("type");
 
   if (actionType !== "send" || !orderId || type !== "invoice") {
     return new Response("Invalid action", { status: 400 });
+  }
+
+  // Convert numeric ID to GID if needed
+  if (!orderId.startsWith("gid://")) {
+    orderId = `gid://shopify/Order/${orderId}`;
   }
 
   const orderData = await fetchOrderData(admin, orderId);
