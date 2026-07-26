@@ -14,6 +14,11 @@ import {
   Pagination,
   Banner,
 } from "@shopify/polaris";
+import {
+  PrintIcon,
+  ImportIcon,
+  EmailIcon,
+} from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { DRAFT_ORDERS_QUERY } from "../graphql/draft-orders.query";
@@ -114,9 +119,9 @@ export default function DraftsPage() {
       </IndexTable.Cell>
       <IndexTable.Cell>
         <ButtonGroup>
-          <Button size="slim">Print</Button>
-          <Button size="slim">Download</Button>
-          <Button size="slim">Send</Button>
+          <Button size="slim" icon={PrintIcon}>Print</Button>
+          <Button size="slim" icon={ImportIcon}>Download</Button>
+          <Button size="slim" icon={EmailIcon}>Send</Button>
         </ButtonGroup>
       </IndexTable.Cell>
     </IndexTable.Row>
