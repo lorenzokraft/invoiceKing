@@ -15,12 +15,24 @@ import {
   Box,
   Divider,
   Checkbox,
+  Icon,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
-import { useState, useCallback } from "react";
-import { PrintIcon, ImportIcon, EmailIcon } from "@shopify/polaris-icons";
+import { useState, useCallback, useRef } from "react";
+import {
+  PrintIcon,
+  ImportIcon,
+  EmailIcon,
+  WandIcon,
+  ShareIcon,
+  ViewIcon,
+  ListNumberedIcon,
+  BarcodeIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+} from "@shopify/polaris-icons";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
@@ -102,6 +114,17 @@ export default function TemplatesPage() {
   const submit = useSubmit();
   const [templateType, setTemplateType] = useState(data.templateType);
   const [formData, setFormData] = useState(data);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setFormData((prev) => ({ ...prev, logoUrl: reader.result as string }));
+    };
+    reader.readAsDataURL(file);
+  };
 
   const [overviewOpen, setOverviewOpen] = useState(true);
   const [socialMediaOpen, setSocialMediaOpen] = useState(false);
@@ -136,8 +159,15 @@ export default function TemplatesPage() {
   return (
     <Page fullWidth>
       <TitleBar title="Templates" />
-      <div style={{ display: "flex", gap: "20px", padding: "20px" }}>
-        <div style={{ flex: 1 }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row-reverse",
+          gap: "20px",
+          padding: "20px",
+        }}
+      >
+        <div style={{ flex: "0 0 340px" }}>
           <Card>
             <BlockStack gap="400">
               <Text as="h2" variant="headingMd">
@@ -150,26 +180,57 @@ export default function TemplatesPage() {
               >
                 <InlineStack align="space-between" blockAlign="center">
                   <InlineStack gap="300" blockAlign="center">
-                    <div style={{ fontSize: "20px" }}>🔧</div>
-                    <Text as="p" variant="bodyMd">
+                    <Icon source={WandIcon} tone="base" />
+                    <Text as="p" variant="bodyMd" fontWeight="medium">
                       Overview
                     </Text>
                   </InlineStack>
-                  <div style={{ fontSize: "20px" }}>{overviewOpen ? "▼" : "▶"}</div>
+                  <Icon source={overviewOpen ? ChevronUpIcon : ChevronDownIcon} tone="subdued" />
                 </InlineStack>
               </div>
               <Collapsible open={overviewOpen} id="overview">
                 <BlockStack gap="300">
-                  <TextField
-                    label="Logo"
-                    value={formData.logoUrl}
-                    onChange={handleChange("logoUrl")}
-                    placeholder="Choose file"
-                    autoComplete="off"
-                    connectedRight={
-                      <Button>Browse</Button>
-                    }
-                  />
+                  <div>
+                    <Text as="p" variant="bodyMd">
+                      Logo
+                    </Text>
+                    <div style={{ display: "flex", gap: "8px", marginTop: "4px", alignItems: "center" }}>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoUpload}
+                        style={{ display: "none" }}
+                      />
+                      <Button onClick={() => fileInputRef.current?.click()}>
+                        Browse
+                      </Button>
+                      {formData.logoUrl && (
+                        <>
+                          <img
+                            src={formData.logoUrl}
+                            alt="Logo preview"
+                            style={{
+                              height: "36px",
+                              maxWidth: "100px",
+                              objectFit: "contain",
+                              border: "1px solid #e1e3e5",
+                              borderRadius: "4px",
+                            }}
+                          />
+                          <Button
+                            variant="plain"
+                            tone="critical"
+                            onClick={() =>
+                              setFormData((prev) => ({ ...prev, logoUrl: "" }))
+                            }
+                          >
+                            Remove
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
                   <Select
                     label="Title Font Type"
                     options={[
@@ -314,12 +375,12 @@ export default function TemplatesPage() {
               >
                 <InlineStack align="space-between" blockAlign="center">
                   <InlineStack gap="300" blockAlign="center">
-                    <div style={{ fontSize: "20px" }}>👥</div>
-                    <Text as="p" variant="bodyMd">
+                    <Icon source={ShareIcon} tone="base" />
+                    <Text as="p" variant="bodyMd" fontWeight="medium">
                       Social Media
                     </Text>
                   </InlineStack>
-                  <div style={{ fontSize: "20px" }}>{socialMediaOpen ? "▼" : "▶"}</div>
+                  <Icon source={socialMediaOpen ? ChevronUpIcon : ChevronDownIcon} tone="subdued" />
                 </InlineStack>
               </div>
               <Collapsible open={socialMediaOpen} id="social">
@@ -356,14 +417,14 @@ export default function TemplatesPage() {
               >
                 <InlineStack align="space-between" blockAlign="center">
                   <InlineStack gap="300" blockAlign="center">
-                    <div style={{ fontSize: "20px" }}>📝</div>
-                    <Text as="p" variant="bodyMd">
+                    <Icon source={ViewIcon} tone="base" />
+                    <Text as="p" variant="bodyMd" fontWeight="medium">
                       {templateType === "invoice" && "Invoice Details"}
                       {templateType === "draft" && "Draft Details"}
                       {templateType === "packing_slip" && "Packing Slip Details"}
                     </Text>
                   </InlineStack>
-                  <div style={{ fontSize: "20px" }}>{detailsOpen ? "▼" : "▶"}</div>
+                  <Icon source={detailsOpen ? ChevronUpIcon : ChevronDownIcon} tone="subdued" />
                 </InlineStack>
               </div>
               <Collapsible open={detailsOpen} id="details">
@@ -417,12 +478,12 @@ export default function TemplatesPage() {
               >
                 <InlineStack align="space-between" blockAlign="center">
                   <InlineStack gap="300" blockAlign="center">
-                    <div style={{ fontSize: "20px" }}>🔢</div>
-                    <Text as="p" variant="bodyMd">
+                    <Icon source={ListNumberedIcon} tone="base" />
+                    <Text as="p" variant="bodyMd" fontWeight="medium">
                       Invoice Numbering
                     </Text>
                   </InlineStack>
-                  <div style={{ fontSize: "20px" }}>{numberingOpen ? "▼" : "▶"}</div>
+                  <Icon source={numberingOpen ? ChevronUpIcon : ChevronDownIcon} tone="subdued" />
                 </InlineStack>
               </div>
 
@@ -434,12 +495,12 @@ export default function TemplatesPage() {
               >
                 <InlineStack align="space-between" blockAlign="center">
                   <InlineStack gap="300" blockAlign="center">
-                    <div style={{ fontSize: "20px" }}>📱</div>
-                    <Text as="p" variant="bodyMd">
+                    <Icon source={BarcodeIcon} tone="base" />
+                    <Text as="p" variant="bodyMd" fontWeight="medium">
                       Barcodes & QR Codes
                     </Text>
                   </InlineStack>
-                  <div style={{ fontSize: "20px" }}>{barcodesOpen ? "▼" : "▶"}</div>
+                  <Icon source={barcodesOpen ? ChevronUpIcon : ChevronDownIcon} tone="subdued" />
                 </InlineStack>
               </div>
 
@@ -450,7 +511,7 @@ export default function TemplatesPage() {
           </Card>
         </div>
 
-        <div style={{ flex: "0 0 320px" }}>
+        <div style={{ flex: 1 }}>
           <Card>
             <BlockStack gap="400">
               <InlineStack align="space-between">
@@ -486,20 +547,32 @@ export default function TemplatesPage() {
                       marginBottom: "40px",
                     }}
                   >
-                    <div
-                      style={{
-                        width: "120px",
-                        height: "60px",
-                        border: "2px dashed #ccc",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "12px",
-                        color: "#999",
-                      }}
-                    >
-                      {formData.logoUrl ? "Logo" : "No Logo"}
-                    </div>
+                    {formData.logoUrl ? (
+                      <img
+                        src={formData.logoUrl}
+                        alt="Company logo"
+                        style={{
+                          maxWidth: "120px",
+                          maxHeight: "60px",
+                          objectFit: "contain",
+                        }}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          width: "120px",
+                          height: "60px",
+                          border: "2px dashed #ccc",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "12px",
+                          color: "#999",
+                        }}
+                      >
+                        No Logo
+                      </div>
+                    )}
                     <h1
                       style={{
                         fontSize: `${formData.documentTitleFontSize}px`,
