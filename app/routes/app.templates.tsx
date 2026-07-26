@@ -14,6 +14,7 @@ import {
   Collapsible,
   Box,
   Divider,
+  Checkbox,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
@@ -41,6 +42,15 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     productWeight: "kg",
     productImage: "Do not display",
     productSortType: "Default",
+    facebookUrl: "",
+    instagramUrl: "",
+    xUrl: "",
+    documentTitle: "INVOICE",
+    documentFilename: "invoice-{{order.name}}",
+    displayOrderNo: true,
+    displayInvoiceNo: true,
+    displayOrderDate: true,
+    footerMessage: "Thanks for your business...",
   });
 };
 
@@ -240,9 +250,29 @@ export default function TemplatesPage() {
                 </InlineStack>
               </div>
               <Collapsible open={socialMediaOpen} id="social">
-                <Text as="p" variant="bodyMd" tone="subdued">
-                  Social media links will appear at the bottom of your documents.
-                </Text>
+                <BlockStack gap="300">
+                  <TextField
+                    label="Display Facebook Icon"
+                    value={formData.facebookUrl}
+                    onChange={handleChange("facebookUrl")}
+                    placeholder="Facebook URL"
+                    autoComplete="off"
+                  />
+                  <TextField
+                    label="Display Instagram Icon"
+                    value={formData.instagramUrl}
+                    onChange={handleChange("instagramUrl")}
+                    placeholder="Instagram URL"
+                    autoComplete="off"
+                  />
+                  <TextField
+                    label="Display X Icon"
+                    value={formData.xUrl}
+                    onChange={handleChange("xUrl")}
+                    placeholder="X URL"
+                    autoComplete="off"
+                  />
+                </BlockStack>
               </Collapsible>
 
               <Divider />
@@ -260,6 +290,48 @@ export default function TemplatesPage() {
                   <Text as="span">{detailsOpen ? "−" : "+"}</Text>
                 </InlineStack>
               </div>
+              <Collapsible open={detailsOpen} id="details">
+                <BlockStack gap="300">
+                  <Text as="h3" variant="headingSm">
+                    Document Details
+                  </Text>
+                  <TextField
+                    label="Document Title"
+                    value={formData.documentTitle}
+                    onChange={handleChange("documentTitle")}
+                    autoComplete="off"
+                  />
+                  <TextField
+                    label="Document Filename"
+                    value={formData.documentFilename}
+                    onChange={handleChange("documentFilename")}
+                    autoComplete="off"
+                    helpText="Use {{order.name}} for order number"
+                  />
+                  <Checkbox
+                    label="Display Order No"
+                    checked={formData.displayOrderNo}
+                    onChange={(value) => setFormData((prev) => ({ ...prev, displayOrderNo: value }))}
+                  />
+                  <Checkbox
+                    label="Display Invoice No"
+                    checked={formData.displayInvoiceNo}
+                    onChange={(value) => setFormData((prev) => ({ ...prev, displayInvoiceNo: value }))}
+                  />
+                  <Checkbox
+                    label="Display Order Date"
+                    checked={formData.displayOrderDate}
+                    onChange={(value) => setFormData((prev) => ({ ...prev, displayOrderDate: value }))}
+                  />
+                  <TextField
+                    label="Display Footer Message"
+                    value={formData.footerMessage}
+                    onChange={handleChange("footerMessage")}
+                    multiline={3}
+                    autoComplete="off"
+                  />
+                </BlockStack>
+              </Collapsible>
 
               <Divider />
 
@@ -354,11 +426,7 @@ export default function TemplatesPage() {
                         margin: 0,
                       }}
                     >
-                      {templateType === "invoice" && "INVOICE"}
-                      {templateType === "draft" && "DRAFT"}
-                      {templateType === "credit_note" && "CREDIT NOTE"}
-                      {templateType === "packing_slip" && "PACKING SLIP"}
-                      {templateType === "return_form" && "RETURN FORM"}
+                      {formData.documentTitle || "INVOICE"}
                     </h1>
                     <div style={{ display: "flex", gap: "10px" }}>
                       <div
@@ -402,7 +470,9 @@ export default function TemplatesPage() {
                       gridTemplateColumns: "1fr 1fr 1fr",
                       gap: "20px",
                       marginBottom: "40px",
-                      fontSize: "12px",
+                      fontSize: `${formData.labelFontSize}px`,
+                      fontFamily: formData.labelFontType,
+                      color: formData.labelColor,
                     }}
                   >
                     <div>
@@ -465,7 +535,8 @@ export default function TemplatesPage() {
                     style={{
                       width: "100%",
                       borderCollapse: "collapse",
-                      fontSize: "12px",
+                      fontSize: `${formData.labelFontSize}px`,
+                      fontFamily: formData.labelFontType,
                       marginBottom: "20px",
                     }}
                   >
@@ -559,7 +630,8 @@ export default function TemplatesPage() {
                       style={{
                         display: "flex",
                         justifyContent: "flex-end",
-                        fontSize: "12px",
+                        fontSize: `${formData.labelFontSize}px`,
+                        fontFamily: formData.labelFontType,
                       }}
                     >
                       <div style={{ width: "200px" }}>
@@ -634,17 +706,33 @@ export default function TemplatesPage() {
                     style={{
                       textAlign: "center",
                       marginTop: "40px",
-                      fontSize: "12px",
+                      fontSize: `${formData.labelFontSize}px`,
+                      fontFamily: formData.labelFontType,
                     }}
                   >
-                    <p style={{ fontWeight: "bold" }}>
-                      Thanks for your business...
-                    </p>
-                    <p style={{ color: "#666" }}>
+                    {formData.footerMessage && (
+                      <p style={{ fontWeight: "bold", marginBottom: "8px" }}>
+                        {formData.footerMessage}
+                      </p>
+                    )}
+                    <p style={{ color: "#666", marginTop: "8px" }}>
                       We truly appreciate your trust, and we'll do our best to
                       continue to give you the service you deserve. We look
                       forward to serving you again.
                     </p>
+                    {(formData.facebookUrl || formData.instagramUrl || formData.xUrl) && (
+                      <div style={{ marginTop: "16px", display: "flex", gap: "12px", justifyContent: "center" }}>
+                        {formData.facebookUrl && (
+                          <span style={{ fontSize: "16px" }}>📘</span>
+                        )}
+                        {formData.instagramUrl && (
+                          <span style={{ fontSize: "16px" }}>📷</span>
+                        )}
+                        {formData.xUrl && (
+                          <span style={{ fontSize: "16px" }}>✖️</span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
