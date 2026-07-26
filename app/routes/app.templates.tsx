@@ -67,6 +67,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     displayInvoiceNo: savedSettings?.displayInvoiceNo ?? true,
     displayOrderDate: savedSettings?.displayOrderDate ?? true,
     footerMessage: savedSettings?.footerMessage || "Thanks for your business...",
+    language: savedSettings?.language || "en",
+    templateStyle: savedSettings?.templateStyle || "slim",
   });
 };
 
@@ -132,6 +134,37 @@ export default function TemplatesPage() {
   const [numberingOpen, setNumberingOpen] = useState(false);
   const [barcodesOpen, setBarcodesOpen] = useState(false);
 
+  const languageOptions = [
+    { label: "English", value: "en" },
+    { label: "Arabic", value: "ar" },
+    { label: "Azerbaijani", value: "az" },
+    { label: "Bulgarian", value: "bg" },
+    { label: "Chinese", value: "zh" },
+    { label: "Croatian", value: "hr" },
+    { label: "Czech", value: "cs" },
+    { label: "Danish", value: "da" },
+    { label: "Dutch", value: "nl" },
+    { label: "Estonian", value: "et" },
+    { label: "Finnish", value: "fi" },
+    { label: "French", value: "fr" },
+    { label: "German", value: "de" },
+    { label: "Spanish", value: "es" },
+  ];
+
+  const isRTL = formData.language === "ar" || formData.language === "he";
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleDownload = () => {
+    shopify.toast.show("Download functionality coming soon");
+  };
+
+  const handleSend = () => {
+    shopify.toast.show("Send functionality coming soon");
+  };
+
   const handleChange = useCallback(
     (field: string) => (value: string) => {
       setFormData((prev) => ({ ...prev, [field]: value }));
@@ -176,7 +209,7 @@ export default function TemplatesPage() {
 
               <div
                 onClick={() => setOverviewOpen(!overviewOpen)}
-                style={{ cursor: "pointer", padding: "12px 0" }}
+                style={{ cursor: "pointer", padding: "12px 0", borderBottom: "1px solid #e1e3e5" }}
               >
                 <InlineStack align="space-between" blockAlign="center">
                   <InlineStack gap="300" blockAlign="center">
@@ -185,7 +218,9 @@ export default function TemplatesPage() {
                       Overview
                     </Text>
                   </InlineStack>
-                  <Icon source={overviewOpen ? ChevronUpIcon : ChevronDownIcon} tone="subdued" />
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <Icon source={overviewOpen ? ChevronUpIcon : ChevronDownIcon} tone="subdued" />
+                  </div>
                 </InlineStack>
               </div>
               <Collapsible open={overviewOpen} id="overview">
@@ -371,7 +406,7 @@ export default function TemplatesPage() {
 
               <div
                 onClick={() => setSocialMediaOpen(!socialMediaOpen)}
-                style={{ cursor: "pointer", padding: "12px 0" }}
+                style={{ cursor: "pointer", padding: "12px 0", borderBottom: "1px solid #e1e3e5" }}
               >
                 <InlineStack align="space-between" blockAlign="center">
                   <InlineStack gap="300" blockAlign="center">
@@ -380,7 +415,9 @@ export default function TemplatesPage() {
                       Social Media
                     </Text>
                   </InlineStack>
-                  <Icon source={socialMediaOpen ? ChevronUpIcon : ChevronDownIcon} tone="subdued" />
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <Icon source={socialMediaOpen ? ChevronUpIcon : ChevronDownIcon} tone="subdued" />
+                  </div>
                 </InlineStack>
               </div>
               <Collapsible open={socialMediaOpen} id="social">
@@ -413,7 +450,7 @@ export default function TemplatesPage() {
 
               <div
                 onClick={() => setDetailsOpen(!detailsOpen)}
-                style={{ cursor: "pointer", padding: "12px 0" }}
+                style={{ cursor: "pointer", padding: "12px 0", borderBottom: "1px solid #e1e3e5" }}
               >
                 <InlineStack align="space-between" blockAlign="center">
                   <InlineStack gap="300" blockAlign="center">
@@ -424,7 +461,9 @@ export default function TemplatesPage() {
                       {templateType === "packing_slip" && "Packing Slip Details"}
                     </Text>
                   </InlineStack>
-                  <Icon source={detailsOpen ? ChevronUpIcon : ChevronDownIcon} tone="subdued" />
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <Icon source={detailsOpen ? ChevronUpIcon : ChevronDownIcon} tone="subdued" />
+                  </div>
                 </InlineStack>
               </div>
               <Collapsible open={detailsOpen} id="details">
@@ -474,7 +513,7 @@ export default function TemplatesPage() {
 
               <div
                 onClick={() => setNumberingOpen(!numberingOpen)}
-                style={{ cursor: "pointer", padding: "12px 0" }}
+                style={{ cursor: "pointer", padding: "12px 0", borderBottom: "1px solid #e1e3e5" }}
               >
                 <InlineStack align="space-between" blockAlign="center">
                   <InlineStack gap="300" blockAlign="center">
@@ -483,7 +522,9 @@ export default function TemplatesPage() {
                       Invoice Numbering
                     </Text>
                   </InlineStack>
-                  <Icon source={numberingOpen ? ChevronUpIcon : ChevronDownIcon} tone="subdued" />
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <Icon source={numberingOpen ? ChevronUpIcon : ChevronDownIcon} tone="subdued" />
+                  </div>
                 </InlineStack>
               </div>
 
@@ -491,7 +532,7 @@ export default function TemplatesPage() {
 
               <div
                 onClick={() => setBarcodesOpen(!barcodesOpen)}
-                style={{ cursor: "pointer", padding: "12px 0" }}
+                style={{ cursor: "pointer", padding: "12px 0", borderBottom: "1px solid #e1e3e5" }}
               >
                 <InlineStack align="space-between" blockAlign="center">
                   <InlineStack gap="300" blockAlign="center">
@@ -500,7 +541,9 @@ export default function TemplatesPage() {
                       Barcodes & QR Codes
                     </Text>
                   </InlineStack>
-                  <Icon source={barcodesOpen ? ChevronUpIcon : ChevronDownIcon} tone="subdued" />
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <Icon source={barcodesOpen ? ChevronUpIcon : ChevronDownIcon} tone="subdued" />
+                  </div>
                 </InlineStack>
               </div>
 
@@ -516,9 +559,10 @@ export default function TemplatesPage() {
             <BlockStack gap="400">
               <InlineStack align="space-between" blockAlign="center">
                 <InlineStack gap="200">
-                  <Button icon={PrintIcon}>Print</Button>
-                  <Button icon={ImportIcon}>Download</Button>
-                  <Button icon={EmailIcon}>Send</Button>
+                  <Button icon={PrintIcon} onClick={handlePrint}>Print</Button>
+                  <Button icon={ImportIcon} onClick={handleDownload}>Download</Button>
+                  <Button icon={EmailIcon} onClick={handleSend}>Send</Button>
+                  <Button url="/app/templates/gallery" variant="secondary">Change Template</Button>
                 </InlineStack>
                 <InlineStack gap="200" blockAlign="center">
                   <Text as="p" variant="bodyMd">
@@ -549,6 +593,17 @@ export default function TemplatesPage() {
                 </InlineStack>
               </InlineStack>
 
+              <InlineStack align="end" blockAlign="center">
+                <div style={{ minWidth: "200px" }}>
+                  <Select
+                    label="Language"
+                    options={languageOptions}
+                    value={formData.language}
+                    onChange={handleChange("language")}
+                  />
+                </div>
+              </InlineStack>
+
               <div
                 style={{
                   border: "1px solid #e1e3e5",
@@ -556,6 +611,7 @@ export default function TemplatesPage() {
                   padding: "40px",
                   backgroundColor: "#fff",
                   minHeight: "800px",
+                  direction: isRTL ? "rtl" : "ltr",
                 }}
               >
                 <div style={{ maxWidth: "700px", margin: "0 auto" }}>
