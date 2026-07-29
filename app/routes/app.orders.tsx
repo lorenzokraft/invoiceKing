@@ -139,7 +139,15 @@ export default function OrdersPage() {
             <Button
               size="slim"
               icon={PrintIcon}
-              url={`/app/invoice/${encodeURIComponent(node.id)}`}
+              onClick={() => {
+                const form = document.createElement('form');
+                form.method = 'GET';
+                form.action = `/api/documents/print?type=invoice&orderId=${encodeURIComponent(node.id)}&shop=${encodeURIComponent(shop)}`;
+                form.target = '_blank';
+                document.body.appendChild(form);
+                form.submit();
+                document.body.removeChild(form);
+              }}
             >
               Print
             </Button>
