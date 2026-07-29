@@ -16,7 +16,14 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     const gid = orderId.startsWith("gid://")
       ? orderId
       : `gid://shopify/Order/${orderId}`;
-    return redirect(`/app/invoice/${encodeURIComponent(gid)}?print=true`);
+    const redirectParams = new URLSearchParams(url.searchParams);
+    redirectParams.delete("mode");
+    redirectParams.delete("type");
+    redirectParams.delete("id");
+    redirectParams.set("print", "true");
+    return redirect(
+      `/app/invoice/${encodeURIComponent(gid)}?${redirectParams.toString()}`,
+    );
   }
 
   return json({
