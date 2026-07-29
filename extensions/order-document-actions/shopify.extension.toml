@@ -8,9 +8,6 @@ uid = "5182661c-3325-781a-d0b8-cff9b4a389ee829869bc"
 target = "admin.order-details.action.link"
 url = "/api/documents/print?type=invoice"
 
-[extensions.targeting.link]
-target = "_blank"
-
 [[extensions]]
 type = "admin_link"
 name = "Print Packing Slip"
@@ -20,9 +17,6 @@ uid = "7260c552-22f1-3cb4-36a3-ec02dd19273f62388599"
 [[extensions.targeting]]
 target = "admin.order-details.action.link"
 url = "/api/documents/print?type=packing-slip"
-
-[extensions.targeting.link]
-target = "_blank"
 
 [[extensions]]
 type = "admin_link"
@@ -34,9 +28,6 @@ uid = "afec8dd3-0285-df29-2cbf-c6e53c7e05c6dabf160d"
 target = "admin.order-details.action.link"
 url = "/api/documents/download?type=invoice"
 
-[extensions.targeting.link]
-target = "_blank"
-
 [[extensions]]
 type = "admin_link"
 name = "Download Packing Slip"
@@ -46,9 +37,6 @@ uid = "91a5905d-40ab-0d5c-6a18-008c52928e566e8c2557"
 [[extensions.targeting]]
 target = "admin.order-details.action.link"
 url = "/api/documents/download?type=packing-slip"
-
-[extensions.targeting.link]
-target = "_blank"
 
 [[extensions]]
 type = "admin_link"

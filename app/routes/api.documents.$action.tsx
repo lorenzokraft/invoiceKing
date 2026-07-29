@@ -243,11 +243,27 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
       <html>
         <head>
           <title>Print ${type === "invoice" ? "Invoice" : "Packing Slip"}</title>
+          <style>
+            body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+            #toolbar { position: fixed; top: 0; left: 0; right: 0; background: #f6f6f7; border-bottom: 1px solid #e1e3e5; padding: 12px 20px; z-index: 1000; display: flex; gap: 12px; }
+            button { background: #008060; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; }
+            button:hover { background: #006e52; }
+            button.secondary { background: #f6f6f7; color: #202223; border: 1px solid #c9cccf; }
+            button.secondary:hover { background: #e1e3e5; }
+            #pdfFrame { margin-top: 60px; width: 100%; height: calc(100vh - 60px); border: none; }
+            @media print {
+              #toolbar { display: none; }
+              #pdfFrame { margin-top: 0; height: 100vh; }
+            }
+          </style>
         </head>
-        <body style="margin: 0; padding: 0;">
+        <body>
+          <div id="toolbar">
+            <button onclick="window.print()">🖨️ Print</button>
+            <button class="secondary" onclick="window.history.back()">← Back to Order</button>
+          </div>
           <iframe
             id="pdfFrame"
-            style="width: 100%; height: 100vh; border: none;"
             src="data:application/pdf;base64,${base64Pdf}"
           ></iframe>
           <script>
