@@ -1,6 +1,7 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useSearchParams } from "@remix-run/react";
+import { useEffect } from "react";
 import { Page, Card, Button, InlineStack, BlockStack, Text } from "@shopify/polaris";
 import { PrintIcon, ImportIcon, EmailIcon } from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
@@ -104,6 +105,16 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
 export default function InvoiceViewPage() {
   const { order, shop } = useLoaderData<typeof loader>();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("print") === "true") {
+      const timer = setTimeout(() => {
+        window.print();
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
 
   const handlePrint = () => {
     window.print();
