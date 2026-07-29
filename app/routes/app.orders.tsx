@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData, useSearchParams } from "@remix-run/react";
+import { useLoaderData, useSearchParams, Link } from "@remix-run/react";
 import {
   Page,
   Card,
@@ -26,7 +26,7 @@ import { authenticate } from "../shopify.server";
 import { ORDERS_QUERY } from "../graphql/orders.query";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { admin } = await authenticate.admin(request);
+  const { admin, session } = await authenticate.admin(request);
   const url = new URL(request.url);
   const cursor = url.searchParams.get("cursor");
   const searchQuery = url.searchParams.get("q") || "";
@@ -47,7 +47,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       hasPreviousPage: false,
     };
 
-    return json({ orders, pageInfo, searchQuery, error: null });
+    return json({ orders, pageInfo, searchQuery, error: null, shop: session.shop });
   } catch (error: any) {
     const message: string = error?.message || "Failed to load orders";
     console.error("Orders loader error:", message);
@@ -56,6 +56,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       orders: [],
       pageInfo: { hasNextPage: false, hasPreviousPage: false },
       searchQuery,
+      shop: session.shop,
       error: message.includes("not approved to access")
         ? "This app needs Protected Customer Data access approval to read orders. Enable it in the Shopify dev dashboard under API access."
         : message,
@@ -64,7 +65,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export default function OrdersPage() {
-  const { orders, pageInfo, error } = useLoaderData<typeof loader>();
+  const { orders, pageInfo, error, shop } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
   const searchQuery = searchParams.get("q") || "";
 
@@ -77,9 +78,12 @@ export default function OrdersPage() {
     ({ node }: any, index: number) => (
       <IndexTable.Row id={node.id} key={node.id} position={index}>
         <IndexTable.Cell>
-          <Text variant="bodyMd" fontWeight="bold" as="span">
+          <Link
+            to={`/app/invoice/${encodeURIComponent(node.id)}`}
+            style={{ color: "#008060", textDecoration: "none", fontWeight: "bold" }}
+          >
             {node.name}
-          </Text>
+          </Link>
         </IndexTable.Cell>
         <IndexTable.Cell>
           {new Date(node.createdAt).toLocaleString("en-US", {
@@ -136,7 +140,7 @@ export default function OrdersPage() {
               size="slim"
               icon={PrintIcon}
               onClick={() => {
-                const url = `/api/documents/print?type=invoice&orderId=${encodeURIComponent(node.id)}`;
+                const url = `/api/documents/print?type=invoice&orderId=${encodeURIComponent(node.id)}&shop=${encodeURIComponent(shop)}`;
                 window.open(url, "_blank");
               }}
             >
@@ -146,7 +150,7 @@ export default function OrdersPage() {
               size="slim"
               icon={ImportIcon}
               onClick={() => {
-                const url = `/api/documents/download?type=invoice&orderId=${encodeURIComponent(node.id)}`;
+                const url = `/api/documents/download?type=invoice&orderId=${encodeURIComponent(node.id)}&shop=${encodeURIComponent(shop)}`;
                 window.open(url, "_blank");
               }}
             >
@@ -156,7 +160,7 @@ export default function OrdersPage() {
               size="slim"
               icon={EmailIcon}
               onClick={async () => {
-                const url = `/api/documents/send?type=invoice&orderId=${encodeURIComponent(node.id)}`;
+                const url = `/api/documents/send?type=invoice&orderId=${encodeURIComponent(node.id)}&shop=${encodeURIComponent(shop)}`;
                 try {
                   const response = await fetch(url, { method: "POST" });
                   const data = await response.json();

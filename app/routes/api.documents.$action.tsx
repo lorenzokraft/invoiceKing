@@ -173,11 +173,11 @@ async function trackDocument(
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const { admin, session } = await authenticate.admin(request);
-  const shop = session.shop;
   const action = params.action;
   const url = new URL(request.url);
   let orderId = url.searchParams.get("id") || url.searchParams.get("orderId");
   const type = url.searchParams.get("type");
+  const shop = url.searchParams.get("shop") || session.shop;
 
   if (!orderId || !type || !action) {
     return new Response("Missing parameters", { status: 400 });
@@ -245,11 +245,11 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
 export const action = async ({ request, params }: ActionFunctionArgs) => {
   const { admin, session } = await authenticate.admin(request);
-  const shop = session.shop;
   const actionType = params.action;
   const url = new URL(request.url);
   let orderId = url.searchParams.get("id") || url.searchParams.get("orderId");
   const type = url.searchParams.get("type");
+  const shop = url.searchParams.get("shop") || session.shop;
 
   if (actionType !== "send" || !orderId || type !== "invoice") {
     return new Response("Invalid action", { status: 400 });
