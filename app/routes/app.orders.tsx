@@ -139,10 +139,7 @@ export default function OrdersPage() {
             <Button
               size="slim"
               icon={PrintIcon}
-              onClick={() => {
-                const url = `/api/documents/print?type=invoice&orderId=${encodeURIComponent(node.id)}&shop=${encodeURIComponent(shop)}`;
-                window.open(url, "_blank");
-              }}
+              url={`/app/invoice/${encodeURIComponent(node.id)}`}
             >
               Print
             </Button>
@@ -150,8 +147,13 @@ export default function OrdersPage() {
               size="slim"
               icon={ImportIcon}
               onClick={() => {
-                const url = `/api/documents/download?type=invoice&orderId=${encodeURIComponent(node.id)}&shop=${encodeURIComponent(shop)}`;
-                window.open(url, "_blank");
+                const form = document.createElement('form');
+                form.method = 'GET';
+                form.action = `/api/documents/download?type=invoice&orderId=${encodeURIComponent(node.id)}&shop=${encodeURIComponent(shop)}`;
+                form.target = '_blank';
+                document.body.appendChild(form);
+                form.submit();
+                document.body.removeChild(form);
               }}
             >
               Download
