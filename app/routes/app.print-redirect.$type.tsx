@@ -3,9 +3,15 @@ import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   await authenticate.admin(request);
-  const { type, orderId } = params;
+  const { type } = params;
+  const url = new URL(request.url);
+  const orderId = url.searchParams.get("id");
   
-  const printUrl = `/app/print/${type}/${orderId}`;
+  if (!orderId) {
+    return new Response("Order ID required", { status: 400 });
+  }
+  
+  const printUrl = `/app/print/${type}/${encodeURIComponent(orderId)}`;
   
   return new Response(
     `<!DOCTYPE html>
