@@ -1,5 +1,5 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { useEffect, useState, useCallback } from "react";
 import { Page, Card, BlockStack, InlineStack, Text, Button, Spinner } from "@shopify/polaris";
@@ -11,6 +11,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const orderId = url.searchParams.get("id") || "";
   const type = url.searchParams.get("type") || "invoice";
   const mode = url.searchParams.get("mode") || "print";
+
+  if (mode === "print" && orderId) {
+    const gid = orderId.startsWith("gid://")
+      ? orderId
+      : `gid://shopify/Order/${orderId}`;
+    return redirect(`/app/invoice/${encodeURIComponent(gid)}?print=true`);
+  }
 
   return json({
     shop: session.shop,
