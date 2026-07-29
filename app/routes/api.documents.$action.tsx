@@ -230,10 +230,44 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
   const stream = await renderToStream(<Template data={orderData} />);
 
-  const disposition =
-    action === "download"
-      ? `attachment; filename="${filename}"`
-      : `inline; filename="${filename}"`;
+  if (action === "print") {
+    const chunks: any[] = [];
+    for await (const chunk of stream as any) {
+      chunks.push(chunk);
+    }
+    const pdfBuffer = Buffer.concat(chunks);
+    const base64Pdf = pdfBuffer.toString('base64');
+    
+    return new Response(
+      `<!DOCTYPE html>
+      <html>
+        <head>
+          <title>Print ${type === "invoice" ? "Invoice" : "Packing Slip"}</title>
+        </head>
+        <body style="margin: 0; padding: 0;">
+          <iframe
+            id="pdfFrame"
+            style="width: 100%; height: 100vh; border: none;"
+            src="data:application/pdf;base64,${base64Pdf}"
+          ></iframe>
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+              }, 500);
+            };
+          </script>
+        </body>
+      </html>`,
+      {
+        headers: {
+          "Content-Type": "text/html",
+        },
+      },
+    );
+  }
+
+  const disposition = `attachment; filename="${filename}"`;
 
   return new Response(stream as any, {
     headers: {
