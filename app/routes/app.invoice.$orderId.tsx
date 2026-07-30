@@ -106,6 +106,9 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 export default function InvoiceViewPage() {
   const { order, shop } = useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
+  
+  const docType = searchParams.get("type") || "invoice";
+  const documentTitle = docType === "packing-slip" ? "PACKING SLIP" : "INVOICE";
 
   useEffect(() => {
     if (searchParams.get("print") === "true") {
@@ -191,7 +194,7 @@ export default function InvoiceViewPage() {
               >
                 <div>
                   <Text as="h1" variant="heading2xl">
-                    INVOICE
+                    {documentTitle}
                   </Text>
                 </div>
                 <div style={{ textAlign: "right" }}>

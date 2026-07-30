@@ -18,12 +18,21 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       : `gid://shopify/Order/${orderId}`;
     const redirectParams = new URLSearchParams(url.searchParams);
     redirectParams.delete("mode");
-    redirectParams.delete("type");
     redirectParams.delete("id");
     redirectParams.set("print", "true");
-    return redirect(
-      `/app/invoice/${encodeURIComponent(gid)}?${redirectParams.toString()}`,
-    );
+    const invoiceUrl = `/app/invoice/${encodeURIComponent(gid)}?${redirectParams.toString()}`;
+    const numericOrderId = orderId.replace(/^gid:\/\/shopify\/Order\//, "");
+    const storeHandle = session.shop.replace(".myshopify.com", "");
+    const orderAdminUrl = `https://admin.shopify.com/store/${storeHandle}/orders/${numericOrderId}`;
+    
+    return json({
+      shop: session.shop,
+      orderId,
+      type,
+      mode: "print-redirect",
+      invoiceUrl,
+      orderAdminUrl,
+    });
   }
 
   return json({
@@ -35,7 +44,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export default function DocumentActionPage() {
-  const { shop, orderId, type, mode } = useLoaderData<typeof loader>();
+  const data = useLoaderData<typeof loader>();
+  const { shop, orderId, type, mode } = data;
   const [status, setStatus] = useState<"loading" | "done" | "error">("loading");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -48,6 +58,17 @@ export default function DocumentActionPage() {
   const goBackToOrder = useCallback(() => {
     window.open(orderAdminUrl, "_top");
   }, [orderAdminUrl]);
+
+  useEffect(() => {
+    if (mode === "print-redirect") {
+      const invoiceUrl = (data as any).invoiceUrl;
+      const orderUrl = (data as any).orderAdminUrl;
+      window.open(invoiceUrl, "_blank");
+      setTimeout(() => {
+        window.open(orderUrl, "_top");
+      }, 500);
+    }
+  }, [mode, data]);
 
   const runAction = useCallback(async () => {
     try {
