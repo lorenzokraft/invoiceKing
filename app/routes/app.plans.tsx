@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData, useSubmit, useNavigation } from "@remix-run/react";
+import { useLoaderData, useSubmit, useNavigation, useActionData } from "@remix-run/react";
 import {
   Page,
   Card,
@@ -117,7 +117,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const { session } = await authenticate.admin(request);
+  const { billing, session } = await authenticate.admin(request);
   const shop = session.shop;
   const formData = await request.formData();
   const tier = String(formData.get("tier"));
@@ -126,13 +126,47 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return json({ error: "Invalid plan" }, { status: 400 });
   }
 
-  // TODO: integrate Shopify Billing API with 7 day trial before switching paid plans.
-  await db.shopSettings.update({
-    where: { shop },
-    data: { planTier: tier as "FREE" | "BASIC" | "PRO" | "PREMIUM" },
+  if (tier === "FREE") {
+    await db.shopSettings.update({
+      where: { shop },
+      data: { planTier: "FREE", subscriptionId: null },
+    });
+    return json({ success: true });
+  }
+
+  const planName =
+    tier === "BASIC"
+      ? "Basic Plan"
+      : tier === "PRO"
+        ? "Pro Plan"
+        : "Premium Plan";
+
+  const billingCheck = await billing.check({
+    plans: [planName],
+    isTest: true,
   });
 
-  return json({ success: true });
+  if (billingCheck.appSubscriptions.length > 0) {
+    await db.shopSettings.update({
+      where: { shop },
+      data: {
+        planTier: tier as "BASIC" | "PRO" | "PREMIUM",
+        subscriptionId: billingCheck.appSubscriptions[0].id,
+      },
+    });
+    return json({ success: true });
+  }
+
+  const appUrl = process.env.SHOPIFY_APP_URL || "";
+  const returnUrl = `${appUrl}/app/billing`;
+
+  const confirmationUrl = await billing.request({
+    plan: planName,
+    isTest: true,
+    returnUrl,
+  });
+
+  return json({ confirmationUrl: String(confirmationUrl) });
 };
 
 export default function PlansPage() {
@@ -154,6 +188,15 @@ export default function PlansPage() {
   const handleSelect = (tier: string) => {
     submit({ tier }, { method: "post" });
   };
+
+  const actionData = useActionData<typeof action>();
+
+  useEffect(() => {
+    const data = actionData as any;
+    if (data?.confirmationUrl) {
+      window.top?.location.assign(data.confirmationUrl);
+    }
+  }, [actionData]);
 
   return (
     <Page fullWidth>
