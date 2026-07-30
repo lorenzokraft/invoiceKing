@@ -2,6 +2,7 @@ import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { renderToStream } from "@react-pdf/renderer";
 import { authenticate } from "../shopify.server";
 import { InvoiceTemplate, PackingSlipTemplate } from "../lib/pdf-templates";
+import type { TemplateSettings } from "../lib/pdf-templates";
 import db from "../db.server";
 import { DocumentType, DocumentStatus } from "@prisma/client";
 
@@ -94,6 +95,39 @@ async function fetchOrderData(admin: any, orderId: string) {
     total: parseFloat(order.totalPriceSet.shopMoney.amount).toFixed(2),
     currency: order.totalPriceSet.shopMoney.currencyCode,
     storeName: "Your Store",
+  };
+}
+
+async function loadTemplateSettings(
+  shop: string,
+  type: string,
+): Promise<TemplateSettings> {
+  const template = await db.template.findFirst({
+    where: { shop, type: "INVOICE" },
+  });
+
+  const config = (template?.config as any) || {};
+
+  const defaultTitle = type === "invoice" ? "INVOICE" : "PACKING SLIP";
+  const documentTitle =
+    type === "invoice"
+      ? config.documentTitle || defaultTitle
+      : defaultTitle;
+
+  return {
+    documentTitle,
+    titleColor: config.titleColor,
+    documentTitleFontSize: config.documentTitleFontSize
+      ? Math.min(Number(config.documentTitleFontSize), 40)
+      : undefined,
+    labelColor: config.labelColor,
+    labelFontSize: config.labelFontSize
+      ? Number(config.labelFontSize)
+      : undefined,
+    footerMessage: config.footerMessage,
+    logoUrl: config.logoUrl || undefined,
+    displayOrderNo: config.displayOrderNo ?? true,
+    displayOrderDate: config.displayOrderDate ?? true,
   };
 }
 
@@ -228,7 +262,11 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
       ? `invoice-${orderData.orderNumber}.pdf`
       : `packing-slip-${orderData.orderNumber}.pdf`;
 
-  const stream = await renderToStream(<Template data={orderData} />);
+  const templateSettings = await loadTemplateSettings(shop, type);
+
+  const stream = await renderToStream(
+    <Template data={orderData} settings={templateSettings} />,
+  );
 
   if (action === "print") {
     const chunks: any[] = [];

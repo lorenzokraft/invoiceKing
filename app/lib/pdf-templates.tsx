@@ -4,8 +4,33 @@ import {
   Page,
   Text,
   View,
+  Image,
   StyleSheet,
 } from "@react-pdf/renderer";
+
+export interface TemplateSettings {
+  documentTitle?: string;
+  titleColor?: string;
+  documentTitleFontSize?: number;
+  labelColor?: string;
+  labelFontSize?: number;
+  footerMessage?: string;
+  logoUrl?: string;
+  displayOrderNo?: boolean;
+  displayOrderDate?: boolean;
+}
+
+const DEFAULT_SETTINGS: Required<TemplateSettings> = {
+  documentTitle: "INVOICE",
+  titleColor: "#000000",
+  documentTitleFontSize: 24,
+  labelColor: "#6d6f80",
+  labelFontSize: 10,
+  footerMessage: "Thanks for your business...",
+  logoUrl: "",
+  displayOrderNo: true,
+  displayOrderDate: true,
+};
 
 const styles = StyleSheet.create({
   page: {
@@ -60,6 +85,16 @@ const styles = StyleSheet.create({
   bold: {
     fontWeight: "bold",
   },
+  logo: {
+    width: 80,
+    height: 80,
+    objectFit: "contain",
+    marginBottom: 10,
+  },
+  footer: {
+    marginTop: 30,
+    textAlign: "center",
+  },
 });
 
 interface OrderData {
@@ -90,13 +125,34 @@ interface OrderData {
   storeName: string;
 }
 
-export const InvoiceTemplate: React.FC<{ data: OrderData }> = ({ data }) => (
+export const InvoiceTemplate: React.FC<{
+  data: OrderData;
+  settings?: TemplateSettings;
+}> = ({ data, settings }) => {
+  const s = { ...DEFAULT_SETTINGS, ...settings };
+  return (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.header}>
-        <Text style={styles.title}>INVOICE</Text>
-        <Text>Invoice #{data.orderNumber}</Text>
-        <Text>Date: {new Date(data.createdAt).toLocaleDateString()}</Text>
+        {s.logoUrl ? <Image style={styles.logo} src={s.logoUrl} /> : null}
+        <Text
+          style={[
+            styles.title,
+            { color: s.titleColor, fontSize: s.documentTitleFontSize },
+          ]}
+        >
+          {s.documentTitle}
+        </Text>
+        {s.displayOrderNo ? (
+          <Text style={{ color: s.labelColor, fontSize: s.labelFontSize }}>
+            Order #{data.orderNumber}
+          </Text>
+        ) : null}
+        {s.displayOrderDate ? (
+          <Text style={{ color: s.labelColor, fontSize: s.labelFontSize }}>
+            Date: {new Date(data.createdAt).toLocaleDateString()}
+          </Text>
+        ) : null}
       </View>
 
       <View style={styles.section}>
@@ -165,19 +221,49 @@ export const InvoiceTemplate: React.FC<{ data: OrderData }> = ({ data }) => (
           </Text>
         </View>
       </View>
+
+      {s.footerMessage ? (
+        <View style={styles.footer}>
+          <Text style={styles.bold}>{s.footerMessage}</Text>
+        </View>
+      ) : null}
     </Page>
   </Document>
-);
+  );
+};
 
-export const PackingSlipTemplate: React.FC<{ data: OrderData }> = ({
-  data,
-}) => (
+export const PackingSlipTemplate: React.FC<{
+  data: OrderData;
+  settings?: TemplateSettings;
+}> = ({ data, settings }) => {
+  const s = {
+    ...DEFAULT_SETTINGS,
+    documentTitle: "PACKING SLIP",
+    ...settings,
+  };
+  return (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.header}>
-        <Text style={styles.title}>PACKING SLIP</Text>
-        <Text>Order #{data.orderNumber}</Text>
-        <Text>Date: {new Date(data.createdAt).toLocaleDateString()}</Text>
+        {s.logoUrl ? <Image style={styles.logo} src={s.logoUrl} /> : null}
+        <Text
+          style={[
+            styles.title,
+            { color: s.titleColor, fontSize: s.documentTitleFontSize },
+          ]}
+        >
+          {s.documentTitle}
+        </Text>
+        {s.displayOrderNo ? (
+          <Text style={{ color: s.labelColor, fontSize: s.labelFontSize }}>
+            Order #{data.orderNumber}
+          </Text>
+        ) : null}
+        {s.displayOrderDate ? (
+          <Text style={{ color: s.labelColor, fontSize: s.labelFontSize }}>
+            Date: {new Date(data.createdAt).toLocaleDateString()}
+          </Text>
+        ) : null}
       </View>
 
       <View style={styles.section}>
@@ -216,6 +302,13 @@ export const PackingSlipTemplate: React.FC<{ data: OrderData }> = ({
           </View>
         ))}
       </View>
+
+      {s.footerMessage ? (
+        <View style={styles.footer}>
+          <Text style={styles.bold}>{s.footerMessage}</Text>
+        </View>
+      ) : null}
     </Page>
   </Document>
-);
+  );
+};

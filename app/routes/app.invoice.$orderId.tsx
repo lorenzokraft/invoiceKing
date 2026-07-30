@@ -6,6 +6,7 @@ import { Page, Card, Button, InlineStack, BlockStack, Text } from "@shopify/pola
 import { PrintIcon, ImportIcon, EmailIcon } from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
+import db from "../db.server";
 
 const ORDER_QUERY = `#graphql
   query GetOrder($id: ID!) {
@@ -97,18 +98,30 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     throw new Response("Order not found", { status: 404 });
   }
 
+  const template = await db.template.findFirst({
+    where: { shop: session.shop, type: "INVOICE" },
+  });
+
   return json({
     order,
     shop: session.shop,
+    templateConfig: (template?.config as any) || {},
   });
 };
 
 export default function InvoiceViewPage() {
-  const { order, shop } = useLoaderData<typeof loader>();
+  const { order, shop, templateConfig } = useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
-  
+
   const docType = searchParams.get("type") || "invoice";
-  const documentTitle = docType === "packing-slip" ? "PACKING SLIP" : "INVOICE";
+  const documentTitle =
+    docType === "packing-slip"
+      ? "PACKING SLIP"
+      : templateConfig?.documentTitle || "INVOICE";
+  const titleColor = templateConfig?.titleColor || "#000000";
+  const footerMessage =
+    templateConfig?.footerMessage || "Thanks for your business...";
+  const logoUrl = templateConfig?.logoUrl || "";
 
   useEffect(() => {
     if (searchParams.get("print") === "true") {
@@ -193,9 +206,28 @@ export default function InvoiceViewPage() {
                 }}
               >
                 <div>
-                  <Text as="h1" variant="heading2xl">
+                  {logoUrl && (
+                    <img
+                      src={logoUrl}
+                      alt="Store logo"
+                      style={{
+                        maxWidth: "120px",
+                        maxHeight: "80px",
+                        objectFit: "contain",
+                        marginBottom: "12px",
+                        display: "block",
+                      }}
+                    />
+                  )}
+                  <span
+                    style={{
+                      fontSize: "32px",
+                      fontWeight: 700,
+                      color: titleColor,
+                    }}
+                  >
                     {documentTitle}
-                  </Text>
+                  </span>
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div
@@ -376,7 +408,7 @@ export default function InvoiceViewPage() {
 
               <div style={{ textAlign: "center", marginTop: "40px" }}>
                 <Text as="p" variant="headingSm" fontWeight="bold">
-                  Thanks for your business...
+                  {footerMessage}
                 </Text>
                 <Text as="p" variant="bodyMd" tone="subdued">
                   We truly appreciate your trust, and we'll do our best to continue to give you
