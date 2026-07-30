@@ -175,28 +175,33 @@ export default function InvoiceViewPage() {
       <TitleBar title={`Invoice - ${order.name}`} />
       <Card>
         <BlockStack gap="400">
-          <InlineStack align="space-between" blockAlign="center">
-            <InlineStack gap="200">
-              <Button icon={PrintIcon} onClick={handlePrint}>
-                Print
-              </Button>
-              <Button icon={ImportIcon} onClick={handleDownload}>
-                Download
-              </Button>
-              <Button icon={EmailIcon} onClick={handleSend}>
-                Send
-              </Button>
+          <div className="no-print">
+            <InlineStack align="space-between" blockAlign="center">
+              <InlineStack gap="200">
+                <Button icon={PrintIcon} onClick={handlePrint}>
+                  Print
+                </Button>
+                <Button icon={ImportIcon} onClick={handleDownload}>
+                  Download
+                </Button>
+                <Button icon={EmailIcon} onClick={handleSend}>
+                  Send
+                </Button>
+              </InlineStack>
             </InlineStack>
-          </InlineStack>
+          </div>
 
           <div
             style={{
-              border: "1px solid #e1e3e5",
-              borderRadius: "8px",
               padding: "40px",
               backgroundColor: "#fff",
             }}
           >
+            <style>{`
+              @media print {
+                .no-print { display: none !important; }
+              }
+            `}</style>
             <div style={{ maxWidth: "800px", margin: "0 auto" }}>
               <div
                 style={{
