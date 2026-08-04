@@ -1,7 +1,7 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useNavigate } from "@remix-run/react";
-import { Page, Layout, Card, BlockStack, InlineGrid, Text, Button } from "@shopify/polaris";
+import { Page, Layout, Card, BlockStack, InlineGrid, Text, Button, Badge } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 
@@ -15,40 +15,58 @@ export default function TemplateGallery() {
 
   const templates = [
     {
-      id: "slim",
-      name: "Slim",
+      id: "pure",
+      name: "Pure",
+      tier: "Free",
       description: "Clean and minimal design with elegant typography",
-      preview: "/templates/slim-preview.png",
     },
     {
-      id: "nice",
-      name: "Nice",
-      description: "Modern layout with bold headers and clear sections",
-      preview: "/templates/nice-preview.png",
+      id: "agile",
+      name: "Agile",
+      tier: "Premium",
+      description: "Modern layout with structured information blocks",
     },
     {
-      id: "coffee",
-      name: "Coffee",
-      description: "Stylish design with custom branding elements",
-      preview: "/templates/coffee-preview.png",
+      id: "aqua",
+      name: "Aqua",
+      tier: "Premium",
+      description: "Fresh design with clear visual hierarchy",
     },
     {
-      id: "liner",
-      name: "Liner",
-      description: "Professional layout with structured information",
-      preview: "/templates/liner-preview.png",
+      id: "aurora",
+      name: "Aurora",
+      tier: "Premium",
+      description: "Professional layout with bold accents",
     },
     {
-      id: "classic",
-      name: "Classic",
-      description: "Traditional invoice format with timeless appeal",
-      preview: "/templates/classic-preview.png",
+      id: "epoch",
+      name: "Epoch",
+      tier: "Premium",
+      description: "Contemporary design with strong contrast",
     },
     {
-      id: "modern",
-      name: "Modern",
-      description: "Contemporary design with bold typography",
-      preview: "/templates/modern-preview.png",
+      id: "leo",
+      name: "Leo",
+      tier: "Premium",
+      description: "Stylish template with custom branding elements",
+    },
+    {
+      id: "ocean",
+      name: "Ocean",
+      tier: "Premium",
+      description: "Modern dark theme with elegant spacing",
+    },
+    {
+      id: "retro",
+      name: "Retro",
+      tier: "Premium",
+      description: "Classic black design with timeless appeal",
+    },
+    {
+      id: "rhythm",
+      name: "Rhythm",
+      tier: "Premium",
+      description: "Balanced layout with structured sections",
     },
   ];
 
@@ -69,21 +87,36 @@ export default function TemplateGallery() {
               {templates.map((template) => (
                 <Card key={template.id}>
                   <BlockStack gap="400">
-                    <div
-                      style={{
-                        width: "100%",
-                        height: "300px",
-                        backgroundColor: "#f6f6f7",
-                        borderRadius: "8px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        border: "1px solid #e1e3e5",
-                      }}
-                    >
-                      <Text as="p" variant="bodyMd" tone="subdued">
-                        {template.name} Template Preview
-                      </Text>
+                    <div style={{ position: "relative" }}>
+                      <div
+                        style={{
+                          width: "100%",
+                          height: "350px",
+                          background: "linear-gradient(135deg, #c7b3e5 0%, #b8a3d9 100%)",
+                          borderRadius: "8px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          border: "1px solid #e1e3e5",
+                        }}
+                      >
+                        <Text as="p" variant="headingLg" tone="subdued">
+                          {template.name}
+                        </Text>
+                      </div>
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "12px",
+                          left: "12px",
+                        }}
+                      >
+                        <Badge
+                          tone={template.tier === "Free" ? "success" : "info"}
+                        >
+                          {template.tier}
+                        </Badge>
+                      </div>
                     </div>
                     <BlockStack gap="200">
                       <Text as="h3" variant="headingMd">

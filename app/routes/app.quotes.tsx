@@ -1,7 +1,7 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { Page, Layout, Card, EmptyState, BlockStack, Text, Button, InlineStack } from "@shopify/polaris";
+import { Page, Layout, Card, EmptyState, BlockStack, Text, Button } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
@@ -17,14 +17,14 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   });
 };
 
-export default function CreditNotesPage() {
+export default function QuotesPage() {
   const { planTier } = useLoaderData<typeof loader>();
   const hasAccess = planTier === "PRO" || planTier === "PREMIUM";
 
   if (!hasAccess) {
     return (
       <Page fullWidth>
-        <TitleBar title="Credit Notes" />
+        <TitleBar title="Quotes" />
         <Layout>
           <Layout.Section>
             <Card>
@@ -33,22 +33,20 @@ export default function CreditNotesPage() {
                   <div style={{ maxWidth: "400px" }}>
                     <img
                       src="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
-                      alt="Credit Notes"
+                      alt="Quotes"
                       style={{ width: "100%", maxWidth: "300px" }}
                     />
                   </div>
                   <BlockStack gap="300" inlineAlign="center">
                     <Text as="h2" variant="headingXl">
-                      CREATE ADVANCED CREDIT NOTES
+                      CREATE QUOTES & GET PAID FASTER
                     </Text>
                     <div style={{ maxWidth: "600px" }}>
                       <Text as="p" variant="bodyLg" tone="subdued">
-                        A credit note is an official legal document, just like an invoice, that sellers provide to
-                        customers to notify the customer about refunded, partially refunded or canceled orders. Credit
-                        notes are typically used when there has been an error in an already-issued invoice, such as an
-                        incorrect amount, or when a customer wishes to change their original order. With the help of
-                        Advanced Credit Notes, you can auto create credit notes for your refunded, partially refunded
-                        and canceled orders. It is also possible to use sequential numbers for your credit notes.
+                        Increase your revenue with quotes. A quote is an agreement between you and your customer to
+                        provide a service or product at an agreed-upon price and within a specific time-frame. The
+                        quote shows a breakdown of the individual charges that are added together to create the total
+                        cost. You can create quotes and get paid by your customers instantly.
                       </Text>
                     </div>
                     <Button variant="primary" size="large" url="/app/plans">
@@ -66,17 +64,16 @@ export default function CreditNotesPage() {
 
   return (
     <Page fullWidth>
-      <TitleBar title="Credit Notes" />
+      <TitleBar title="Quotes" />
       <Layout>
         <Layout.Section>
           <Card>
             <EmptyState
-              heading="Credit notes for refunds and cancellations"
+              heading="Create quotes and get paid faster"
               image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
             >
               <p>
-                Credit notes created manually or automatically from refunds and
-                cancellations will appear here.
+                Quotes you create for your customers will appear here.
               </p>
             </EmptyState>
           </Card>

@@ -203,9 +203,14 @@ export default function TemplatesPage() {
         <div style={{ flex: "0 0 340px" }}>
           <Card>
             <BlockStack gap="400">
-              <Text as="h2" variant="headingMd">
-                Slim
-              </Text>
+              <InlineStack align="space-between" blockAlign="center">
+                <Text as="h2" variant="headingMd">
+                  Slim
+                </Text>
+                <Button url="/app/templates/gallery" variant="plain">
+                  Change Template
+                </Button>
+              </InlineStack>
 
               <div
                 onClick={() => setOverviewOpen(!overviewOpen)}
