@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData, useSubmit, useNavigation, useActionData } from "@remix-run/react";
+import { useLoaderData, useSubmit, useNavigation } from "@remix-run/react";
 import {
   Page,
   Card,
@@ -160,13 +160,15 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const appUrl = process.env.SHOPIFY_APP_URL || "";
   const returnUrl = `${appUrl}/app/billing`;
 
-  const confirmationUrl = await billing.request({
+  // billing.request throws a redirect Response to Shopify's
+  // subscription approval page. It never returns.
+  await billing.request({
     plan: planName,
     isTest: true,
     returnUrl,
   });
 
-  return json({ confirmationUrl: String(confirmationUrl) });
+  return json({ success: true });
 };
 
 export default function PlansPage() {
@@ -188,15 +190,6 @@ export default function PlansPage() {
   const handleSelect = (tier: string) => {
     submit({ tier }, { method: "post" });
   };
-
-  const actionData = useActionData<typeof action>();
-
-  useEffect(() => {
-    const data = actionData as any;
-    if (data?.confirmationUrl) {
-      window.top?.location.assign(data.confirmationUrl);
-    }
-  }, [actionData]);
 
   return (
     <Page fullWidth>
