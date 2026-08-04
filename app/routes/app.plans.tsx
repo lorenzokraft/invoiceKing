@@ -141,9 +141,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         ? "Pro Plan"
         : "Premium Plan";
 
+  const isTest = process.env.NODE_ENV !== "production";
+
   const billingCheck = await billing.check({
     plans: [planName],
-    isTest: true,
+    isTest,
   });
 
   if (billingCheck.appSubscriptions.length > 0) {
@@ -164,7 +166,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   // subscription approval page. It never returns.
   await billing.request({
     plan: planName,
-    isTest: true,
+    isTest,
     returnUrl,
   });
 
