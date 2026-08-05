@@ -58,7 +58,7 @@ const CONFIGS: Record<string, TemplateConfig> = {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 6,
+            fontSize: 8,
             color: "#fff",
             fontWeight: 800,
             fontFamily: "monospace",
@@ -67,8 +67,8 @@ const CONFIGS: Record<string, TemplateConfig> = {
           ▀▄▀
         </div>
         <div>
-          <div style={{ fontSize: 11, fontWeight: 800, color: p.ink }}>SWEET CAKES</div>
-          <div style={{ fontSize: 5.5, letterSpacing: 2, color: p.sub }}>BAKERY</div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: p.ink }}>SWEET CAKES</div>
+          <div style={{ fontSize: 7.5, letterSpacing: 2, color: p.sub }}>BAKERY</div>
         </div>
       </div>
     ),
@@ -79,8 +79,8 @@ const CONFIGS: Record<string, TemplateConfig> = {
     palette: light("#1a1a1a"),
     logo: (p) => (
       <div style={{ fontFamily: "Georgia, serif" }}>
-        <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: 2, color: p.ink }}>MAPLE &amp; CO.</div>
-        <div style={{ fontSize: 6, letterSpacing: 4, color: p.sub, marginTop: 1 }}>FINE GOODS</div>
+        <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: 2, color: p.ink }}>MAPLE &amp; CO.</div>
+        <div style={{ fontSize: 8, letterSpacing: 4, color: p.sub, marginTop: 1 }}>FINE GOODS</div>
       </div>
     ),
   },
@@ -100,15 +100,15 @@ const CONFIGS: Record<string, TemplateConfig> = {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 9,
+            fontSize: 12,
             fontWeight: 800,
           }}
         >
           U
         </div>
         <div>
-          <div style={{ fontSize: 10, fontWeight: 800, color: p.ink }}>URBAN ROOTS</div>
-          <div style={{ fontSize: 5.5, letterSpacing: 2, color: p.sub }}>GARDEN SUPPLY</div>
+          <div style={{ fontSize: 13, fontWeight: 800, color: p.ink }}>URBAN ROOTS</div>
+          <div style={{ fontSize: 7.5, letterSpacing: 2, color: p.sub }}>GARDEN SUPPLY</div>
         </div>
       </div>
     ),
@@ -119,7 +119,7 @@ const CONFIGS: Record<string, TemplateConfig> = {
     palette: light("#0e7c86", { headBg: "#e6f4f5", headInk: "#0e7c86" }),
     logo: (p) => (
       <div>
-        <div style={{ fontSize: 12, fontWeight: 800, color: p.accent, fontStyle: "italic" }}>
+        <div style={{ fontSize: 15, fontWeight: 800, color: p.accent, fontStyle: "italic" }}>
           aqua<span style={{ color: "#1a1a1a" }}>bloom</span>
         </div>
         <div style={{ height: 2, width: 40, background: p.accent, borderRadius: 2, marginTop: 2 }} />
@@ -132,10 +132,10 @@ const CONFIGS: Record<string, TemplateConfig> = {
     palette: light("#26413c", { headBg: "#26413c", headInk: "#ffffff" }),
     logo: (p) => (
       <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-        <div style={{ fontSize: 14, color: p.headInk }}>▲</div>
+        <div style={{ fontSize: 17, color: p.headInk }}>▲</div>
         <div>
-          <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: 1.5, color: p.headInk }}>NORTH PINE</div>
-          <div style={{ fontSize: 5.5, letterSpacing: 3, color: "#9db8b2" }}>OUTFITTERS</div>
+          <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.5, color: p.headInk }}>NORTH PINE</div>
+          <div style={{ fontSize: 7.5, letterSpacing: 3, color: "#9db8b2" }}>OUTFITTERS</div>
         </div>
       </div>
     ),
@@ -146,8 +146,8 @@ const CONFIGS: Record<string, TemplateConfig> = {
     palette: light("#111111", { headBg: "#111111", headInk: "#ffffff" }),
     logo: (p) => (
       <div style={{ display: "flex", alignItems: "baseline", gap: 3 }}>
-        <div style={{ fontSize: 12, fontWeight: 900, color: p.headInk, letterSpacing: 1 }}>EPOCH</div>
-        <div style={{ fontSize: 7, color: "#bbbbbb", letterSpacing: 2 }}>STUDIO</div>
+        <div style={{ fontSize: 15, fontWeight: 900, color: p.headInk, letterSpacing: 1 }}>EPOCH</div>
+        <div style={{ fontSize: 9.5, color: "#bbbbbb", letterSpacing: 2 }}>STUDIO</div>
       </div>
     ),
   },
@@ -168,17 +168,17 @@ const CONFIGS: Record<string, TemplateConfig> = {
             alignItems: "center",
             justifyContent: "center",
             fontFamily: "Georgia, serif",
-            fontSize: 12,
+            fontSize: 15,
             fontWeight: 700,
             color: p.ink,
           }}
         >
           L
         </div>
-        <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: 2, marginTop: 2, color: p.ink }}>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, marginTop: 2, color: p.ink }}>
           LEO&apos;S BAKERY
         </div>
-        <div style={{ fontSize: 5, letterSpacing: 3, color: p.sub }}>EST. 2004</div>
+        <div style={{ fontSize: 7, letterSpacing: 3, color: p.sub }}>EST. 2004</div>
       </div>
     ),
   },
@@ -196,10 +196,10 @@ const CONFIGS: Record<string, TemplateConfig> = {
     },
     logo: (p) => (
       <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-        <div style={{ fontSize: 12, color: p.accent }}>≋</div>
+        <div style={{ fontSize: 15, color: p.accent }}>≋</div>
         <div>
-          <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: 1, color: p.ink }}>OCEAN CRATE</div>
-          <div style={{ fontSize: 5.5, letterSpacing: 2, color: p.sub }}>SEAFOOD MARKET</div>
+          <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1, color: p.ink }}>OCEAN CRATE</div>
+          <div style={{ fontSize: 7.5, letterSpacing: 2, color: p.sub }}>SEAFOOD MARKET</div>
         </div>
       </div>
     ),
@@ -218,8 +218,8 @@ const CONFIGS: Record<string, TemplateConfig> = {
           textAlign: "center",
         }}
       >
-        <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: 2, color: p.headInk }}>RETRO ROAST</div>
-        <div style={{ fontSize: 5, letterSpacing: 3, color: "#b8a98c" }}>★ COFFEE CO. ★</div>
+        <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 2, color: p.headInk }}>RETRO ROAST</div>
+        <div style={{ fontSize: 7, letterSpacing: 3, color: "#b8a98c" }}>★ COFFEE CO. ★</div>
       </div>
     ),
   },
@@ -235,8 +235,8 @@ const CONFIGS: Record<string, TemplateConfig> = {
           ))}
         </div>
         <div>
-          <div style={{ fontSize: 10, fontWeight: 800, color: p.ink }}>RHYTHM</div>
-          <div style={{ fontSize: 5.5, letterSpacing: 2, color: p.sub }}>MUSIC GOODS</div>
+          <div style={{ fontSize: 13, fontWeight: 800, color: p.ink }}>RHYTHM</div>
+          <div style={{ fontSize: 7.5, letterSpacing: 2, color: p.sub }}>MUSIC GOODS</div>
         </div>
       </div>
     ),
@@ -258,8 +258,8 @@ const TOTALS = [
 function AddressBlock({ title, p }: { title: string; p: Palette }) {
   return (
     <div>
-      <div style={{ fontSize: 6, fontWeight: 800, letterSpacing: 1, color: p.ink, marginBottom: 2 }}>{title}</div>
-      <div style={{ fontSize: 5.5, color: p.sub, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 8, fontWeight: 800, letterSpacing: 1, color: p.ink, marginBottom: 2 }}>{title}</div>
+      <div style={{ fontSize: 7.5, color: p.sub, lineHeight: 1.5 }}>
         Chuck Woods
         <br />
         355 East Front Street
@@ -283,7 +283,7 @@ function ItemsTable({ p }: { p: Palette }) {
           background: p.headBg,
           color: p.headInk,
           padding: "3px 5px",
-          fontSize: 5.5,
+          fontSize: 7.5,
           fontWeight: 800,
           letterSpacing: 0.5,
           borderRadius: 2,
@@ -307,17 +307,17 @@ function ItemsTable({ p }: { p: Palette }) {
           }}
         >
           <div style={{ display: "flex", gap: 3, alignItems: "center" }}>
-            <div style={{ width: 12, height: 12, flexShrink: 0 }}>
+            <div style={{ width: 22, height: 22, flexShrink: 0 }}>
               <ProductIcon color={p.accent} />
             </div>
             <div>
-              <div style={{ fontSize: 5.5, fontWeight: 700, color: p.ink }}>{item.name}</div>
-              <div style={{ fontSize: 5, color: p.sub }}>{item.detail}</div>
+              <div style={{ fontSize: 7.5, fontWeight: 700, color: p.ink }}>{item.name}</div>
+              <div style={{ fontSize: 7, color: p.sub }}>{item.detail}</div>
             </div>
           </div>
-          <div style={{ fontSize: 5, color: p.sub }}>{item.sku}</div>
-          <div style={{ fontSize: 5, color: p.sub }}>{item.qty}</div>
-          <div style={{ fontSize: 5.5, fontWeight: 700, color: p.ink, textAlign: "right" }}>{item.price}</div>
+          <div style={{ fontSize: 7, color: p.sub }}>{item.sku}</div>
+          <div style={{ fontSize: 7, color: p.sub }}>{item.qty}</div>
+          <div style={{ fontSize: 7.5, fontWeight: 700, color: p.ink, textAlign: "right" }}>{item.price}</div>
         </div>
       ))}
     </div>
@@ -334,7 +334,7 @@ function TotalsBlock({ p, boxed }: { p: Palette; boxed?: boolean }) {
             style={{
               display: "flex",
               justifyContent: "space-between",
-              fontSize: 5.5,
+              fontSize: 7.5,
               color: p.sub,
               padding: "2px 4px",
               borderBottom: `1px solid ${p.line}`,
@@ -348,7 +348,7 @@ function TotalsBlock({ p, boxed }: { p: Palette; boxed?: boolean }) {
           style={{
             display: "flex",
             justifyContent: "space-between",
-            fontSize: 7,
+            fontSize: 9.5,
             fontWeight: 800,
             padding: "3px 4px",
             marginTop: 2,
@@ -368,8 +368,8 @@ function TotalsBlock({ p, boxed }: { p: Palette; boxed?: boolean }) {
 function Footer({ p }: { p: Palette }) {
   return (
     <div style={{ marginTop: 8, paddingTop: 5, borderTop: `1px solid ${p.line}` }}>
-      <div style={{ fontSize: 5.5, fontWeight: 800, color: p.ink, marginBottom: 1 }}>Thanks for your business</div>
-      <div style={{ fontSize: 5, color: p.sub, lineHeight: 1.4 }}>
+      <div style={{ fontSize: 7.5, fontWeight: 800, color: p.ink, marginBottom: 1 }}>Thanks for your business</div>
+      <div style={{ fontSize: 7, color: p.sub, lineHeight: 1.4 }}>
         We truly appreciate your trust and look forward to serving you again.
       </div>
       <div style={{ display: "flex", gap: 3, marginTop: 4 }}>
@@ -390,15 +390,15 @@ function MetaBlock({ p, align }: { p: Palette; align?: "right" | "left" }) {
         ["ORDER DATE", "21 Nov, 2026"],
       ].map(([label, value]) => (
         <div key={label} style={{ marginBottom: 3 }}>
-          <div style={{ fontSize: 5, fontWeight: 800, letterSpacing: 1, color: p.sub }}>{label}</div>
-          <div style={{ fontSize: 6, fontWeight: 700, color: p.ink }}>{value}</div>
+          <div style={{ fontSize: 7, fontWeight: 800, letterSpacing: 1, color: p.sub }}>{label}</div>
+          <div style={{ fontSize: 8, fontWeight: 700, color: p.ink }}>{value}</div>
         </div>
       ))}
     </div>
   );
 }
 
-export function TemplatePreview({ templateId, height = 400 }: { templateId: string; height?: number }) {
+export function TemplatePreview({ templateId, height = 480 }: { templateId: string; height?: number }) {
   const config = CONFIGS[templateId] || CONFIGS.pure;
   const p = config.palette;
 
@@ -415,7 +415,7 @@ export function TemplatePreview({ templateId, height = 400 }: { templateId: stri
   };
 
   const invoiceTitle = (color?: string) => (
-    <div style={{ fontSize: 16, fontWeight: 900, letterSpacing: 1, color: color || p.ink }}>INVOICE</div>
+    <div style={{ fontSize: 20, fontWeight: 900, letterSpacing: 1, color: color || p.ink }}>INVOICE</div>
   );
 
   switch (config.layout) {
@@ -461,7 +461,7 @@ export function TemplatePreview({ templateId, height = 400 }: { templateId: stri
               marginBottom: 8,
             }}
           >
-            <span style={{ fontSize: 12, fontWeight: 900, letterSpacing: 3 }}>INVOICE</span>
+            <span style={{ fontSize: 15, fontWeight: 900, letterSpacing: 3 }}>INVOICE</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
             <AddressBlock title="SHIP TO" p={p} />
@@ -481,7 +481,7 @@ export function TemplatePreview({ templateId, height = 400 }: { templateId: stri
             {config.logo(p)}
             <div style={{ textAlign: "right" }}>
               {invoiceTitle(p.accent)}
-              <div style={{ fontSize: 5, color: p.sub, marginTop: 1 }}>2026-11-21 13:42:39</div>
+              <div style={{ fontSize: 7, color: p.sub, marginTop: 1 }}>2026-11-21 13:42:39</div>
             </div>
           </div>
           <div style={{ height: 2, background: p.accent, borderRadius: 2, marginBottom: 8 }} />
@@ -522,7 +522,7 @@ export function TemplatePreview({ templateId, height = 400 }: { templateId: stri
         <div style={frame}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
             {config.logo(p)}
-            <div style={{ textAlign: "right", fontSize: 5, color: p.sub, lineHeight: 1.5 }}>
+            <div style={{ textAlign: "right", fontSize: 7, color: p.sub, lineHeight: 1.5 }}>
               {config.company}
               <br />
               Keizersgracht 482, Amsterdam

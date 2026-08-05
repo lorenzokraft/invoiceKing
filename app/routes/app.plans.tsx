@@ -161,7 +161,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 
   const appUrl = process.env.SHOPIFY_APP_URL || "";
-  const returnUrl = `${appUrl}/app/billing`;
+  // Must be OUTSIDE /app so the embedded auth does not run on the
+  // top-level redirect coming back from Shopify's approval page.
+  const returnUrl = `${appUrl}/billing-callback?shop=${shop}`;
 
   // billing.request throws a redirect Response to Shopify's
   // subscription approval page. It never returns.
@@ -197,6 +199,7 @@ export default function PlansPage() {
   return (
     <Page fullWidth>
       <TitleBar title="Select a Plan" />
+      <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 5%" }}>
       <BlockStack gap="500">
         {currentPlan === "FREE" && (
           <Banner tone="info">
@@ -280,6 +283,7 @@ export default function PlansPage() {
           })}
         </InlineGrid>
       </BlockStack>
+      </div>
     </Page>
   );
 }

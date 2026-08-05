@@ -215,7 +215,7 @@ export default function TemplateGallery() {
           {viewing && (
             <InlineStack align="center">
               <div style={{ width: "100%", maxWidth: "620px" }}>
-                <TemplatePreview templateId={viewing.id} height={780} />
+                <TemplatePreview templateId={viewing.id} height={900} />
               </div>
             </InlineStack>
           )}
