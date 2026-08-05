@@ -4,6 +4,7 @@ import { useNavigate } from "@remix-run/react";
 import { Page, Layout, Card, BlockStack, InlineGrid, Text, Button, Badge } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
+import { TemplatePreview } from "../components/TemplatePreview";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await authenticate.admin(request);
@@ -88,22 +89,7 @@ export default function TemplateGallery() {
                 <Card key={template.id}>
                   <BlockStack gap="400">
                     <div style={{ position: "relative" }}>
-                      <div
-                        style={{
-                          width: "100%",
-                          height: "350px",
-                          background: "linear-gradient(135deg, #c7b3e5 0%, #b8a3d9 100%)",
-                          borderRadius: "8px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          border: "1px solid #e1e3e5",
-                        }}
-                      >
-                        <Text as="p" variant="headingLg" tone="subdued">
-                          {template.name}
-                        </Text>
-                      </div>
+                      <TemplatePreview templateId={template.id} />
                       <div
                         style={{
                           position: "absolute",
