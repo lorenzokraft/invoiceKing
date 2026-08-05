@@ -1,5 +1,19 @@
 import type { CSSProperties, ReactNode } from "react";
 
+function ProductIcon({ color = "#d1d5db" }: { color?: string }) {
+  return (
+    <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="18" height="18" rx="2" fill={color} opacity="0.2" />
+      <path
+        d="M7 7h10M7 12h7M7 17h4"
+        stroke={color}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 type Palette = {
   bg: string;
   ink: string;
@@ -29,6 +43,36 @@ const light = (accent: string, overrides?: Partial<Palette>): Palette => ({
 });
 
 const CONFIGS: Record<string, TemplateConfig> = {
+  slim: {
+    company: "Sweet Cakes",
+    layout: "classic",
+    palette: light("#1a1a1a"),
+    logo: (p) => (
+      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <div
+          style={{
+            width: 24,
+            height: 24,
+            background: "#000",
+            borderRadius: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 6,
+            color: "#fff",
+            fontWeight: 800,
+            fontFamily: "monospace",
+          }}
+        >
+          ▀▄▀
+        </div>
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 800, color: p.ink }}>SWEET CAKES</div>
+          <div style={{ fontSize: 5.5, letterSpacing: 2, color: p.sub }}>BAKERY</div>
+        </div>
+      </div>
+    ),
+  },
   pure: {
     company: "Maple & Co.",
     layout: "classic",
@@ -263,7 +307,9 @@ function ItemsTable({ p }: { p: Palette }) {
           }}
         >
           <div style={{ display: "flex", gap: 3, alignItems: "center" }}>
-            <div style={{ width: 10, height: 10, background: p.line, borderRadius: 2, flexShrink: 0 }} />
+            <div style={{ width: 12, height: 12, flexShrink: 0 }}>
+              <ProductIcon color={p.accent} />
+            </div>
             <div>
               <div style={{ fontSize: 5.5, fontWeight: 700, color: p.ink }}>{item.name}</div>
               <div style={{ fontSize: 5, color: p.sub }}>{item.detail}</div>

@@ -25,6 +25,12 @@ export default function TemplateGallery() {
 
   const templates = [
     {
+      id: "slim",
+      name: "Slim",
+      tier: "Free",
+      description: "Simple and clean invoice layout with QR code support",
+    },
+    {
       id: "pure",
       name: "Pure",
       tier: "Free",
@@ -100,6 +106,7 @@ export default function TemplateGallery() {
       `}</style>
       <Layout>
         <Layout.Section>
+          <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 5%" }}>
           <BlockStack gap="600">
             <BlockStack gap="200">
               <Text as="h1" variant="headingLg">
@@ -179,6 +186,7 @@ export default function TemplateGallery() {
               ))}
             </InlineGrid>
           </BlockStack>
+          </div>
         </Layout.Section>
       </Layout>
 
