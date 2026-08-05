@@ -13,7 +13,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     return redirect("/app/plans");
   }
 
-  const isTest = process.env.NODE_ENV !== "production";
+  // Test charges by default. Set BILLING_TEST_MODE=false in Railway to enable real charges.
+  const isTest = process.env.BILLING_TEST_MODE !== "false";
 
   try {
     const billingCheck = await billing.check({

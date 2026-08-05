@@ -141,7 +141,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         ? "Pro Plan"
         : "Premium Plan";
 
-  const isTest = process.env.NODE_ENV !== "production";
+  // Test charges by default. Set BILLING_TEST_MODE=false in Railway to enable real charges.
+  const isTest = process.env.BILLING_TEST_MODE !== "false";
 
   const billingCheck = await billing.check({
     plans: [planName],
