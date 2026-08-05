@@ -1,182 +1,504 @@
-export function TemplatePreview({ templateId }: { templateId: string }) {
-  const getTemplatePreview = () => {
-    const baseStyles = {
-      width: "100%",
-      height: "400px",
-      background: "#fff",
-      borderRadius: "8px",
-      border: "1px solid #e1e3e5",
-      padding: "20px",
-      fontSize: "8px",
-      fontFamily: "system-ui, -apple-system, sans-serif",
-      overflow: "hidden",
-    };
+import type { CSSProperties, ReactNode } from "react";
 
-    const commonHeader = (
-      <>
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px" }}>
-          <div style={{ fontWeight: "bold", fontSize: "10px" }}>SWEET CAKES</div>
-          <div style={{ fontSize: "14px", fontWeight: "bold" }}>INVOICE</div>
+type Palette = {
+  bg: string;
+  ink: string;
+  sub: string;
+  line: string;
+  accent: string;
+  headBg: string;
+  headInk: string;
+};
+
+type TemplateConfig = {
+  company: string;
+  layout: "classic" | "banner" | "centered" | "split" | "sidebar";
+  palette: Palette;
+  logo: (p: Palette) => ReactNode;
+};
+
+const light = (accent: string, overrides?: Partial<Palette>): Palette => ({
+  bg: "#ffffff",
+  ink: "#1a1a1a",
+  sub: "#8a8a8a",
+  line: "#e5e5e5",
+  accent,
+  headBg: "#f4f4f4",
+  headInk: "#1a1a1a",
+  ...overrides,
+});
+
+const CONFIGS: Record<string, TemplateConfig> = {
+  pure: {
+    company: "Maple & Co.",
+    layout: "classic",
+    palette: light("#1a1a1a"),
+    logo: (p) => (
+      <div style={{ fontFamily: "Georgia, serif" }}>
+        <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: 2, color: p.ink }}>MAPLE &amp; CO.</div>
+        <div style={{ fontSize: 6, letterSpacing: 4, color: p.sub, marginTop: 1 }}>FINE GOODS</div>
+      </div>
+    ),
+  },
+  agile: {
+    company: "Urban Roots",
+    layout: "split",
+    palette: light("#2f6f4f", { headBg: "#2f6f4f", headInk: "#ffffff" }),
+    logo: (p) => (
+      <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+        <div
+          style={{
+            width: 20,
+            height: 20,
+            borderRadius: "50%",
+            background: p.accent,
+            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 9,
+            fontWeight: 800,
+          }}
+        >
+          U
         </div>
-        <div style={{ borderBottom: "1px solid #e1e3e5", marginBottom: "10px" }} />
-      </>
-    );
+        <div>
+          <div style={{ fontSize: 10, fontWeight: 800, color: p.ink }}>URBAN ROOTS</div>
+          <div style={{ fontSize: 5.5, letterSpacing: 2, color: p.sub }}>GARDEN SUPPLY</div>
+        </div>
+      </div>
+    ),
+  },
+  aqua: {
+    company: "Aqua Bloom",
+    layout: "split",
+    palette: light("#0e7c86", { headBg: "#e6f4f5", headInk: "#0e7c86" }),
+    logo: (p) => (
+      <div>
+        <div style={{ fontSize: 12, fontWeight: 800, color: p.accent, fontStyle: "italic" }}>
+          aqua<span style={{ color: "#1a1a1a" }}>bloom</span>
+        </div>
+        <div style={{ height: 2, width: 40, background: p.accent, borderRadius: 2, marginTop: 2 }} />
+      </div>
+    ),
+  },
+  aurora: {
+    company: "North Pine",
+    layout: "banner",
+    palette: light("#26413c", { headBg: "#26413c", headInk: "#ffffff" }),
+    logo: (p) => (
+      <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+        <div style={{ fontSize: 14, color: p.headInk }}>▲</div>
+        <div>
+          <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: 1.5, color: p.headInk }}>NORTH PINE</div>
+          <div style={{ fontSize: 5.5, letterSpacing: 3, color: "#9db8b2" }}>OUTFITTERS</div>
+        </div>
+      </div>
+    ),
+  },
+  epoch: {
+    company: "Epoch Studio",
+    layout: "banner",
+    palette: light("#111111", { headBg: "#111111", headInk: "#ffffff" }),
+    logo: (p) => (
+      <div style={{ display: "flex", alignItems: "baseline", gap: 3 }}>
+        <div style={{ fontSize: 12, fontWeight: 900, color: p.headInk, letterSpacing: 1 }}>EPOCH</div>
+        <div style={{ fontSize: 7, color: "#bbbbbb", letterSpacing: 2 }}>STUDIO</div>
+      </div>
+    ),
+  },
+  leo: {
+    company: "Leo's Bakery",
+    layout: "centered",
+    palette: light("#8a5a2b", { headBg: "#1a1a1a", headInk: "#ffffff" }),
+    logo: (p) => (
+      <div style={{ textAlign: "center" }}>
+        <div
+          style={{
+            width: 26,
+            height: 26,
+            margin: "0 auto",
+            border: `1.5px solid ${p.ink}`,
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontFamily: "Georgia, serif",
+            fontSize: 12,
+            fontWeight: 700,
+            color: p.ink,
+          }}
+        >
+          L
+        </div>
+        <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: 2, marginTop: 2, color: p.ink }}>
+          LEO&apos;S BAKERY
+        </div>
+        <div style={{ fontSize: 5, letterSpacing: 3, color: p.sub }}>EST. 2004</div>
+      </div>
+    ),
+  },
+  ocean: {
+    company: "Ocean Crate",
+    layout: "sidebar",
+    palette: {
+      bg: "#0d1b2a",
+      ink: "#f2f5f7",
+      sub: "#8fa3b3",
+      line: "#22364a",
+      accent: "#57c4e5",
+      headBg: "#13263a",
+      headInk: "#f2f5f7",
+    },
+    logo: (p) => (
+      <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+        <div style={{ fontSize: 12, color: p.accent }}>≋</div>
+        <div>
+          <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: 1, color: p.ink }}>OCEAN CRATE</div>
+          <div style={{ fontSize: 5.5, letterSpacing: 2, color: p.sub }}>SEAFOOD MARKET</div>
+        </div>
+      </div>
+    ),
+  },
+  retro: {
+    company: "Retro Roast",
+    layout: "banner",
+    palette: light("#c0392b", { headBg: "#191919", headInk: "#f5e9d6" }),
+    logo: (p) => (
+      <div
+        style={{
+          display: "inline-block",
+          border: `1.5px solid ${p.headInk}`,
+          borderRadius: 4,
+          padding: "3px 8px",
+          textAlign: "center",
+        }}
+      >
+        <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: 2, color: p.headInk }}>RETRO ROAST</div>
+        <div style={{ fontSize: 5, letterSpacing: 3, color: "#b8a98c" }}>★ COFFEE CO. ★</div>
+      </div>
+    ),
+  },
+  rhythm: {
+    company: "Rhythm Goods",
+    layout: "classic",
+    palette: light("#5b3ea6", { headBg: "#f0ecfa", headInk: "#5b3ea6" }),
+    logo: (p) => (
+      <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+        <div style={{ display: "flex", alignItems: "flex-end", gap: 1.5, height: 16 }}>
+          {[7, 12, 9, 15].map((h, i) => (
+            <div key={i} style={{ width: 3, height: h, background: p.accent, borderRadius: 1 }} />
+          ))}
+        </div>
+        <div>
+          <div style={{ fontSize: 10, fontWeight: 800, color: p.ink }}>RHYTHM</div>
+          <div style={{ fontSize: 5.5, letterSpacing: 2, color: p.sub }}>MUSIC GOODS</div>
+        </div>
+      </div>
+    ),
+  },
+};
 
-    switch (templateId) {
-      case "pure":
-        return (
-          <div style={baseStyles}>
-            {commonHeader}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "12px" }}>
-              <div>
-                <div style={{ fontSize: "7px", color: "#666", marginBottom: "2px" }}>BILL TO</div>
-                <div style={{ fontSize: "8px" }}>Customer Name</div>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: "7px", color: "#666" }}>Invoice #: INV-001</div>
-                <div style={{ fontSize: "7px", color: "#666" }}>Date: Jan 1, 2026</div>
-              </div>
-            </div>
-            <div style={{ background: "#f9f9f9", padding: "8px", borderRadius: "4px" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "4px", fontSize: "7px", fontWeight: "bold", marginBottom: "6px" }}>
-                <div>ITEM</div>
-                <div>QTY</div>
-                <div>PRICE</div>
-                <div style={{ textAlign: "right" }}>TOTAL</div>
-              </div>
-              {[1, 2, 3].map((i) => (
-                <div key={i} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "4px", fontSize: "7px", padding: "4px 0", borderTop: "1px solid #e1e3e5" }}>
-                  <div>Product {i}</div>
-                  <div>1</div>
-                  <div>$10.00</div>
-                  <div style={{ textAlign: "right" }}>$10.00</div>
-                </div>
-              ))}
-            </div>
-            <div style={{ marginTop: "12px", textAlign: "right" }}>
-              <div style={{ fontSize: "10px", fontWeight: "bold" }}>Total: $30.00</div>
+const ITEMS = [
+  { name: "Pink Champagne Cookies", detail: "Medium / White", sku: "PNCHSKU138", qty: "x1", price: "$90.00" },
+  { name: "Vegan Friendly Cupcakes", detail: "Brown / Large", sku: "VGN131", qty: "x1", price: "$22.50" },
+];
+
+const TOTALS = [
+  { label: "SUB TOTAL", value: "$125.00" },
+  { label: "DISCOUNT", value: "- $12.50" },
+  { label: "SHIPPING", value: "$6.98" },
+  { label: "TAX", value: "$4.28" },
+];
+
+function AddressBlock({ title, p }: { title: string; p: Palette }) {
+  return (
+    <div>
+      <div style={{ fontSize: 6, fontWeight: 800, letterSpacing: 1, color: p.ink, marginBottom: 2 }}>{title}</div>
+      <div style={{ fontSize: 5.5, color: p.sub, lineHeight: 1.5 }}>
+        Chuck Woods
+        <br />
+        355 East Front Street
+        <br />
+        Evergreen, AL 36401
+        <br />
+        (251) 578-7599
+      </div>
+    </div>
+  );
+}
+
+function ItemsTable({ p }: { p: Palette }) {
+  return (
+    <div style={{ marginTop: 8 }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "3fr 1.5fr 0.7fr 1.2fr",
+          gap: 3,
+          background: p.headBg,
+          color: p.headInk,
+          padding: "3px 5px",
+          fontSize: 5.5,
+          fontWeight: 800,
+          letterSpacing: 0.5,
+          borderRadius: 2,
+        }}
+      >
+        <div>ITEM</div>
+        <div>SKU</div>
+        <div>QTY</div>
+        <div style={{ textAlign: "right" }}>TOTAL</div>
+      </div>
+      {ITEMS.map((item) => (
+        <div
+          key={item.sku}
+          style={{
+            display: "grid",
+            gridTemplateColumns: "3fr 1.5fr 0.7fr 1.2fr",
+            gap: 3,
+            padding: "4px 5px",
+            borderBottom: `1px solid ${p.line}`,
+            alignItems: "center",
+          }}
+        >
+          <div style={{ display: "flex", gap: 3, alignItems: "center" }}>
+            <div style={{ width: 10, height: 10, background: p.line, borderRadius: 2, flexShrink: 0 }} />
+            <div>
+              <div style={{ fontSize: 5.5, fontWeight: 700, color: p.ink }}>{item.name}</div>
+              <div style={{ fontSize: 5, color: p.sub }}>{item.detail}</div>
             </div>
           </div>
-        );
+          <div style={{ fontSize: 5, color: p.sub }}>{item.sku}</div>
+          <div style={{ fontSize: 5, color: p.sub }}>{item.qty}</div>
+          <div style={{ fontSize: 5.5, fontWeight: 700, color: p.ink, textAlign: "right" }}>{item.price}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
-      case "ocean":
-      case "retro":
-        return (
-          <div style={{ ...baseStyles, background: "#000", color: "#fff" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px" }}>
-              <div style={{ fontWeight: "bold", fontSize: "10px", color: "#fff" }}>SWEET CAKES</div>
-              <div style={{ fontSize: "14px", fontWeight: "bold", color: "#fff" }}>INVOICE</div>
-            </div>
-            <div style={{ borderBottom: "1px solid #333", marginBottom: "10px" }} />
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "12px" }}>
-              <div>
-                <div style={{ fontSize: "7px", color: "#999", marginBottom: "2px" }}>BILL TO</div>
-                <div style={{ fontSize: "8px", color: "#fff" }}>Customer Name</div>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: "7px", color: "#999" }}>Invoice #: INV-001</div>
-              </div>
-            </div>
-            <div style={{ background: "#1a1a1a", padding: "8px", borderRadius: "4px" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "4px", fontSize: "7px", fontWeight: "bold", marginBottom: "6px", color: "#fff" }}>
-                <div>ITEM</div>
-                <div>QTY</div>
-                <div>PRICE</div>
-                <div style={{ textAlign: "right" }}>TOTAL</div>
-              </div>
-              {[1, 2, 3].map((i) => (
-                <div key={i} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "4px", fontSize: "7px", padding: "4px 0", borderTop: "1px solid #333", color: "#ccc" }}>
-                  <div>Product {i}</div>
-                  <div>1</div>
-                  <div>$10.00</div>
-                  <div style={{ textAlign: "right" }}>$10.00</div>
-                </div>
-              ))}
-            </div>
-            <div style={{ marginTop: "12px", textAlign: "right" }}>
-              <div style={{ fontSize: "10px", fontWeight: "bold", color: "#fff" }}>Total: $30.00</div>
-            </div>
+function TotalsBlock({ p, boxed }: { p: Palette; boxed?: boolean }) {
+  return (
+    <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 6 }}>
+      <div style={{ width: "45%" }}>
+        {TOTALS.map((t) => (
+          <div
+            key={t.label}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              fontSize: 5.5,
+              color: p.sub,
+              padding: "2px 4px",
+              borderBottom: `1px solid ${p.line}`,
+            }}
+          >
+            <span>{t.label}</span>
+            <span style={{ color: p.ink }}>{t.value}</span>
           </div>
-        );
+        ))}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            fontSize: 7,
+            fontWeight: 800,
+            padding: "3px 4px",
+            marginTop: 2,
+            background: boxed ? p.headBg : "transparent",
+            color: boxed ? p.headInk : p.ink,
+            borderRadius: 2,
+          }}
+        >
+          <span>TOTAL</span>
+          <span>$111.26</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-      case "aurora":
-      case "epoch":
-        return (
-          <div style={baseStyles}>
-            <div style={{ background: "#000", color: "#fff", padding: "12px", marginBottom: "12px", borderRadius: "4px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <div style={{ fontWeight: "bold", fontSize: "10px" }}>SWEET CAKES</div>
-                <div style={{ fontSize: "14px", fontWeight: "bold" }}>INVOICE</div>
-              </div>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "12px" }}>
-              <div>
-                <div style={{ fontSize: "7px", color: "#666", marginBottom: "2px" }}>BILL TO</div>
-                <div style={{ fontSize: "8px" }}>Customer Name</div>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: "7px", color: "#666" }}>Invoice #: INV-001</div>
-              </div>
-            </div>
-            <div style={{ border: "1px solid #e1e3e5", padding: "8px", borderRadius: "4px" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "4px", fontSize: "7px", fontWeight: "bold", marginBottom: "6px" }}>
-                <div>ITEM</div>
-                <div>QTY</div>
-                <div>PRICE</div>
-                <div style={{ textAlign: "right" }}>TOTAL</div>
-              </div>
-              {[1, 2].map((i) => (
-                <div key={i} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "4px", fontSize: "7px", padding: "4px 0", borderTop: "1px solid #e1e3e5" }}>
-                  <div>Product {i}</div>
-                  <div>1</div>
-                  <div>$10.00</div>
-                  <div style={{ textAlign: "right" }}>$10.00</div>
-                </div>
-              ))}
-            </div>
-            <div style={{ marginTop: "12px", background: "#000", color: "#fff", padding: "8px", borderRadius: "4px", textAlign: "right" }}>
-              <div style={{ fontSize: "10px", fontWeight: "bold" }}>Total: $20.00</div>
-            </div>
-          </div>
-        );
+function Footer({ p }: { p: Palette }) {
+  return (
+    <div style={{ marginTop: 8, paddingTop: 5, borderTop: `1px solid ${p.line}` }}>
+      <div style={{ fontSize: 5.5, fontWeight: 800, color: p.ink, marginBottom: 1 }}>Thanks for your business</div>
+      <div style={{ fontSize: 5, color: p.sub, lineHeight: 1.4 }}>
+        We truly appreciate your trust and look forward to serving you again.
+      </div>
+      <div style={{ display: "flex", gap: 3, marginTop: 4 }}>
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div key={i} style={{ width: 6, height: 6, borderRadius: "50%", background: p.line }} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
-      default:
-        return (
-          <div style={baseStyles}>
-            {commonHeader}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "12px" }}>
-              <div>
-                <div style={{ fontSize: "7px", color: "#666", marginBottom: "2px" }}>BILL TO</div>
-                <div style={{ fontSize: "8px" }}>Customer Name</div>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: "7px", color: "#666" }}>Invoice #: INV-001</div>
-                <div style={{ fontSize: "7px", color: "#666" }}>Date: Jan 1, 2026</div>
-              </div>
-            </div>
-            <div style={{ border: "1px solid #e1e3e5", padding: "8px", borderRadius: "4px" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "4px", fontSize: "7px", fontWeight: "bold", marginBottom: "6px" }}>
-                <div>ITEM</div>
-                <div>QTY</div>
-                <div>PRICE</div>
-                <div style={{ textAlign: "right" }}>TOTAL</div>
-              </div>
-              {[1, 2, 3].map((i) => (
-                <div key={i} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "4px", fontSize: "7px", padding: "4px 0", borderTop: "1px solid #e1e3e5" }}>
-                  <div>Product {i}</div>
-                  <div>1</div>
-                  <div>$10.00</div>
-                  <div style={{ textAlign: "right" }}>$10.00</div>
-                </div>
-              ))}
-            </div>
-            <div style={{ marginTop: "12px", textAlign: "right" }}>
-              <div style={{ fontSize: "10px", fontWeight: "bold" }}>Total: $30.00</div>
-            </div>
-          </div>
-        );
-    }
+function MetaBlock({ p, align }: { p: Palette; align?: "right" | "left" }) {
+  return (
+    <div style={{ textAlign: align === "right" ? "right" : "left" }}>
+      {[
+        ["ORDER NO", "#1001"],
+        ["INVOICE NO", "INV-1000"],
+        ["ORDER DATE", "21 Nov, 2026"],
+      ].map(([label, value]) => (
+        <div key={label} style={{ marginBottom: 3 }}>
+          <div style={{ fontSize: 5, fontWeight: 800, letterSpacing: 1, color: p.sub }}>{label}</div>
+          <div style={{ fontSize: 6, fontWeight: 700, color: p.ink }}>{value}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function TemplatePreview({ templateId, height = 400 }: { templateId: string; height?: number }) {
+  const config = CONFIGS[templateId] || CONFIGS.pure;
+  const p = config.palette;
+
+  const frame: CSSProperties = {
+    width: "100%",
+    height,
+    background: p.bg,
+    borderRadius: 8,
+    border: `1px solid ${p.line}`,
+    padding: 14,
+    fontFamily: "system-ui, -apple-system, sans-serif",
+    overflow: "hidden",
+    boxSizing: "border-box",
   };
 
-  return <div>{getTemplatePreview()}</div>;
+  const invoiceTitle = (color?: string) => (
+    <div style={{ fontSize: 16, fontWeight: 900, letterSpacing: 1, color: color || p.ink }}>INVOICE</div>
+  );
+
+  switch (config.layout) {
+    case "banner":
+      return (
+        <div style={frame}>
+          <div
+            style={{
+              background: p.headBg,
+              borderRadius: 4,
+              padding: "8px 10px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 8,
+            }}
+          >
+            {config.logo(p)}
+            {invoiceTitle(p.headInk)}
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+            <AddressBlock title="SHIP TO" p={p} />
+            <AddressBlock title="BILL TO" p={p} />
+            <MetaBlock p={p} align="right" />
+          </div>
+          <ItemsTable p={p} />
+          <TotalsBlock p={p} boxed />
+          <Footer p={p} />
+        </div>
+      );
+
+    case "centered":
+      return (
+        <div style={frame}>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 6 }}>{config.logo(p)}</div>
+          <div
+            style={{
+              background: p.headBg,
+              color: p.headInk,
+              textAlign: "center",
+              padding: "4px 0",
+              borderRadius: 3,
+              marginBottom: 8,
+            }}
+          >
+            <span style={{ fontSize: 12, fontWeight: 900, letterSpacing: 3 }}>INVOICE</span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+            <AddressBlock title="SHIP TO" p={p} />
+            <AddressBlock title="BILL TO" p={p} />
+            <MetaBlock p={p} align="right" />
+          </div>
+          <ItemsTable p={p} />
+          <TotalsBlock p={p} boxed />
+          <Footer p={p} />
+        </div>
+      );
+
+    case "split":
+      return (
+        <div style={frame}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+            {config.logo(p)}
+            <div style={{ textAlign: "right" }}>
+              {invoiceTitle(p.accent)}
+              <div style={{ fontSize: 5, color: p.sub, marginTop: 1 }}>2026-11-21 13:42:39</div>
+            </div>
+          </div>
+          <div style={{ height: 2, background: p.accent, borderRadius: 2, marginBottom: 8 }} />
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+            <AddressBlock title="SHIP TO" p={p} />
+            <AddressBlock title="BILL TO" p={p} />
+            <MetaBlock p={p} align="right" />
+          </div>
+          <ItemsTable p={p} />
+          <TotalsBlock p={p} />
+          <Footer p={p} />
+        </div>
+      );
+
+    case "sidebar":
+      return (
+        <div style={{ ...frame, display: "flex", gap: 10, padding: 0 }}>
+          <div style={{ width: "30%", background: p.headBg, padding: 10, display: "flex", flexDirection: "column", gap: 8 }}>
+            {config.logo(p)}
+            <AddressBlock title="SHIP TO" p={p} />
+            <AddressBlock title="BILL TO" p={p} />
+          </div>
+          <div style={{ flex: 1, padding: "12px 12px 12px 0" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+              {invoiceTitle(p.accent)}
+              <MetaBlock p={p} align="right" />
+            </div>
+            <ItemsTable p={p} />
+            <TotalsBlock p={p} />
+            <Footer p={p} />
+          </div>
+        </div>
+      );
+
+    case "classic":
+    default:
+      return (
+        <div style={frame}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+            {config.logo(p)}
+            <div style={{ textAlign: "right", fontSize: 5, color: p.sub, lineHeight: 1.5 }}>
+              {config.company}
+              <br />
+              Keizersgracht 482, Amsterdam
+              <br />
+              hello@{config.company.toLowerCase().replace(/[^a-z]/g, "")}.com
+            </div>
+          </div>
+          <div style={{ borderBottom: `2px solid ${p.ink}`, marginBottom: 8 }} />
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4 }}>
+            <div>
+              {invoiceTitle()}
+              <div style={{ marginTop: 4 }}>
+                <MetaBlock p={p} />
+              </div>
+            </div>
+            <AddressBlock title="SHIP TO" p={p} />
+            <AddressBlock title="BILL TO" p={p} />
+          </div>
+          <ItemsTable p={p} />
+          <TotalsBlock p={p} />
+          <Footer p={p} />
+        </div>
+      );
+  }
 }
