@@ -89,6 +89,7 @@ model ShopSettings {
   // Billing
   planTier            PlanTier @default(FREE)
   subscriptionId      String?
+  pendingPlanTier     PlanTier? // Scheduled downgrade for next billing cycle
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 

@@ -111,10 +111,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   return json({
     currentPlan: settings.planTier,
+    pendingPlan: settings.pendingPlanTier,
     invoicesThisMonth: usage?.invoiceCount ?? 0,
     resetDate: resetDate.toISOString(),
   });
 };
+
+const PLAN_HIERARCHY = { FREE: 0, BASIC: 1, PRO: 2, PREMIUM: 3 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { billing, session } = await authenticate.admin(request);
@@ -126,12 +129,29 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return json({ error: "Invalid plan" }, { status: 400 });
   }
 
+  const settings = await db.shopSettings.findUnique({ where: { shop } });
+  const currentTier = settings?.planTier || "FREE";
+  const currentSubscriptionId = settings?.subscriptionId;
+
+  // Downgrading to FREE - cancel current subscription immediately
   if (tier === "FREE") {
+    if (currentSubscriptionId) {
+      const isTest = process.env.BILLING_TEST_MODE !== "false";
+      try {
+        await billing.cancel({
+          subscriptionId: currentSubscriptionId,
+          isTest,
+          prorate: true,
+        });
+      } catch (error) {
+        console.error("Subscription cancellation error:", error);
+      }
+    }
     await db.shopSettings.update({
       where: { shop },
-      data: { planTier: "FREE", subscriptionId: null },
+      data: { planTier: "FREE", subscriptionId: null, pendingPlanTier: null },
     });
-    return json({ success: true });
+    return json({ success: true, message: "Downgraded to Free plan" });
   }
 
   const planName =
@@ -144,6 +164,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   // Test charges by default. Set BILLING_TEST_MODE=false in Railway to enable real charges.
   const isTest = process.env.BILLING_TEST_MODE !== "false";
 
+  // Check if user already has this exact plan active
   const billingCheck = await billing.check({
     plans: [planName],
     isTest,
@@ -155,9 +176,40 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       data: {
         planTier: tier as "BASIC" | "PRO" | "PREMIUM",
         subscriptionId: billingCheck.appSubscriptions[0].id,
+        pendingPlanTier: null,
       },
     });
-    return json({ success: true });
+    return json({ success: true, message: "Plan already active" });
+  }
+
+  // Determine if this is an upgrade or downgrade
+  const isUpgrade = PLAN_HIERARCHY[tier as keyof typeof PLAN_HIERARCHY] > PLAN_HIERARCHY[currentTier as keyof typeof PLAN_HIERARCHY];
+
+  // DOWNGRADE: Schedule for next billing cycle, don't lose paid days
+  if (!isUpgrade && currentSubscriptionId) {
+    await db.shopSettings.update({
+      where: { shop },
+      data: { pendingPlanTier: tier as "BASIC" | "PRO" | "PREMIUM" },
+    });
+    return json({ 
+      success: true, 
+      message: `Downgrade to ${planName} scheduled. Your current plan will remain active until the end of your billing period, then automatically switch to ${planName}.`,
+      isPending: true,
+    });
+  }
+
+  // UPGRADE: Apply immediately with proration
+  // Cancel existing subscription if any
+  if (currentSubscriptionId) {
+    try {
+      await billing.cancel({
+        subscriptionId: currentSubscriptionId,
+        isTest,
+        prorate: true,
+      });
+    } catch (error) {
+      console.error("Subscription cancellation error:", error);
+    }
   }
 
   const appUrl = process.env.SHOPIFY_APP_URL || "";
@@ -177,7 +229,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function PlansPage() {
-  const { currentPlan, invoicesThisMonth, resetDate } =
+  const { currentPlan, pendingPlan, invoicesThisMonth, resetDate } =
     useLoaderData<typeof loader>();
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">(
     "monthly",
@@ -209,6 +261,12 @@ export default function PlansPage() {
           </Banner>
         )}
 
+        {pendingPlan && (
+          <Banner tone="warning">
+            You have a scheduled downgrade to {pendingPlan} plan. Your current plan will remain active until the end of your billing period, then automatically switch to {pendingPlan}.
+          </Banner>
+        )}
+
         <InlineStack align="center">
           <ButtonGroup variant="segmented">
             <Button
@@ -229,6 +287,7 @@ export default function PlansPage() {
         <InlineGrid columns={{ xs: 1, sm: 2, lg: 4 }} gap="400">
           {PLANS.map((plan) => {
             const isCurrent = plan.tier === currentPlan;
+            const isPending = plan.tier === pendingPlan;
             const price =
               billingCycle === "monthly" ? plan.monthlyPrice : plan.yearlyPrice;
             const suffix = billingCycle === "monthly" ? "/month" : "/year";
@@ -271,10 +330,10 @@ export default function PlansPage() {
                   <InlineStack align="center">
                     <Button
                       variant={isCurrent ? "secondary" : "primary"}
-                      disabled={isCurrent || isSubmitting}
+                      disabled={isCurrent || isPending || isSubmitting}
                       onClick={() => handleSelect(plan.tier)}
                     >
-                      {isCurrent ? "Selected" : "Select"}
+                      {isCurrent ? "Current Plan" : isPending ? "Scheduled" : "Select"}
                     </Button>
                   </InlineStack>
                 </BlockStack>
