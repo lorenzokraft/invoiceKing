@@ -37,12 +37,40 @@ import {
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
   const shop = session.shop;
+  const url = new URL(request.url);
+  const styleParam = url.searchParams.get("style");
 
   const template = await db.template.findFirst({
     where: { shop, type: "INVOICE" },
   });
 
   const savedSettings = template?.config as any;
+
+  // If style param is present, update the template style
+  if (styleParam && template) {
+    await db.template.update({
+      where: { id: template.id },
+      data: {
+        config: {
+          ...savedSettings,
+          templateStyle: styleParam,
+        },
+      },
+    });
+  } else if (styleParam && !template) {
+    // Create template if it doesn't exist
+    await db.template.create({
+      data: {
+        shop,
+        type: "INVOICE",
+        name: "Default Invoice Template",
+        isDefault: true,
+        config: {
+          templateStyle: styleParam,
+        },
+      },
+    });
+  }
 
   return json({
     templateType: "invoice",
@@ -68,7 +96,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     displayOrderDate: savedSettings?.displayOrderDate ?? true,
     footerMessage: savedSettings?.footerMessage || "Thanks for your business...",
     language: savedSettings?.language || "en",
-    templateStyle: savedSettings?.templateStyle || "slim",
+    templateStyle: styleParam || savedSettings?.templateStyle || "slim",
   });
 };
 
@@ -205,7 +233,7 @@ export default function TemplatesPage() {
             <BlockStack gap="400">
               <InlineStack align="space-between" blockAlign="center">
                 <Text as="h2" variant="headingMd">
-                  Slim
+                  {formData.templateStyle.charAt(0).toUpperCase() + formData.templateStyle.slice(1)}
                 </Text>
                 <Button url="/app/templates/gallery" variant="plain">
                   Change Template

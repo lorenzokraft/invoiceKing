@@ -248,7 +248,7 @@ export default function SettingsPage() {
                     </Text>
                     <TextField
                       label="Additional Languages"
-                      value={formData.additionalLocales.join(", ")}
+                      value={Array.isArray(formData.additionalLocales) ? formData.additionalLocales.join(", ") : formData.additionalLocales}
                       onChange={(value) =>
                         handleChange("additionalLocales")(value)
                       }
