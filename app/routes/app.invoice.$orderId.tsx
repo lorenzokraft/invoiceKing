@@ -7,6 +7,7 @@ import { PrintIcon, ImportIcon, EmailIcon } from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
+import { getTemplateTheme } from "../lib/template-themes";
 
 const ORDER_QUERY = `#graphql
   query GetOrder($id: ID!) {
@@ -118,7 +119,9 @@ export default function InvoiceViewPage() {
     docType === "packing-slip"
       ? "PACKING SLIP"
       : templateConfig?.documentTitle || "INVOICE";
-  const titleColor = templateConfig?.titleColor || "#000000";
+  const theme = getTemplateTheme(templateConfig?.templateStyle);
+  const isBanner = theme.layout === "banner" || theme.layout === "centered";
+  const titleColor = templateConfig?.titleColor || theme.ink;
   const footerMessage =
     templateConfig?.footerMessage || "Thanks for your business...";
   const logoUrl = templateConfig?.logoUrl || "";
@@ -202,12 +205,21 @@ export default function InvoiceViewPage() {
                 .no-print { display: none !important; }
               }
             `}</style>
-            <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+            <div style={{ maxWidth: "800px", margin: "0 auto", fontFamily: theme.fontFamily }}>
               <div
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
+                  alignItems: "center",
                   marginBottom: "40px",
+                  ...(isBanner
+                    ? {
+                        background: theme.bannerBg,
+                        color: theme.bannerInk,
+                        padding: "24px 32px",
+                        borderRadius: "6px",
+                      }
+                    : {}),
                 }}
               >
                 <div>
@@ -221,6 +233,7 @@ export default function InvoiceViewPage() {
                         objectFit: "contain",
                         marginBottom: "12px",
                         display: "block",
+                        ...(isBanner ? { filter: "brightness(0) invert(1)" } : {}),
                       }}
                     />
                   )}
@@ -228,7 +241,8 @@ export default function InvoiceViewPage() {
                     style={{
                       fontSize: "32px",
                       fontWeight: 700,
-                      color: titleColor,
+                      letterSpacing: isBanner ? "2px" : undefined,
+                      color: isBanner ? theme.bannerInk : titleColor,
                     }}
                   >
                     {documentTitle}
@@ -237,25 +251,26 @@ export default function InvoiceViewPage() {
                 <div style={{ textAlign: "right" }}>
                   <div
                     style={{
-                      border: "2px solid #000",
+                      border: `2px solid ${isBanner ? theme.bannerInk : theme.ink}`,
                       padding: "8px 16px",
                       marginBottom: "8px",
+                      color: isBanner ? theme.bannerInk : theme.ink,
                     }}
                   >
-                    <Text as="p" variant="bodyMd" fontWeight="bold">
-                      ORDER NO
-                    </Text>
-                    <Text as="p" variant="bodyMd">
-                      {order.name}
-                    </Text>
+                    <div style={{ fontWeight: 700, fontSize: "13px" }}>ORDER NO</div>
+                    <div style={{ fontSize: "13px" }}>{order.name}</div>
                   </div>
-                  <div style={{ border: "2px solid #000", padding: "8px 16px" }}>
-                    <Text as="p" variant="bodyMd" fontWeight="bold">
-                      ORDER DATE
-                    </Text>
-                    <Text as="p" variant="bodyMd">
+                  <div
+                    style={{
+                      border: `2px solid ${isBanner ? theme.bannerInk : theme.ink}`,
+                      padding: "8px 16px",
+                      color: isBanner ? theme.bannerInk : theme.ink,
+                    }}
+                  >
+                    <div style={{ fontWeight: 700, fontSize: "13px" }}>ORDER DATE</div>
+                    <div style={{ fontSize: "13px" }}>
                       {new Date(order.createdAt).toLocaleDateString()}
-                    </Text>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -345,7 +360,14 @@ export default function InvoiceViewPage() {
                 }}
               >
                 <thead>
-                  <tr style={{ borderTop: "2px solid #000", borderBottom: "2px solid #000" }}>
+                  <tr
+                    style={{
+                      background: theme.headBg,
+                      color: theme.headInk,
+                      borderTop: theme.headBg === "#ffffff" ? `2px solid ${theme.ink}` : "none",
+                      borderBottom: theme.headBg === "#ffffff" ? `2px solid ${theme.ink}` : "none",
+                    }}
+                  >
                     <th style={{ padding: "12px", textAlign: "left" }}>TITLE</th>
                     <th style={{ padding: "12px", textAlign: "left" }}>SKU</th>
                     <th style={{ padding: "12px", textAlign: "center" }}>QTY</th>
@@ -397,9 +419,10 @@ export default function InvoiceViewPage() {
                 </div>
                 <div
                   style={{
-                    borderTop: "2px solid #000",
+                    borderTop: `2px solid ${theme.accent}`,
                     paddingTop: "8px",
                     marginTop: "8px",
+                    color: theme.accent,
                   }}
                 >
                   <Text as="span" variant="headingMd" fontWeight="bold">

@@ -20,6 +20,7 @@ import {
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
+import { getTemplateTheme } from "../lib/template-themes";
 import { useState, useCallback, useRef } from "react";
 import {
   PrintIcon,
@@ -180,6 +181,8 @@ export default function TemplatesPage() {
   ];
 
   const isRTL = formData.language === "ar" || formData.language === "he";
+  const theme = getTemplateTheme(formData.templateStyle);
+  const isBanner = theme.layout === "banner" || theme.layout === "centered";
 
   const handlePrint = () => {
     window.print();
@@ -647,13 +650,21 @@ export default function TemplatesPage() {
                   direction: isRTL ? "rtl" : "ltr",
                 }}
               >
-                <div style={{ maxWidth: "700px", margin: "0 auto" }}>
+                <div style={{ maxWidth: "700px", margin: "0 auto", fontFamily: theme.fontFamily }}>
                   <div
                     style={{
                       display: "flex",
                       justifyContent: "space-between",
-                      alignItems: "flex-start",
+                      alignItems: "center",
                       marginBottom: "40px",
+                      ...(isBanner
+                        ? {
+                            background: theme.bannerBg,
+                            color: theme.bannerInk,
+                            padding: "20px 28px",
+                            borderRadius: "6px",
+                          }
+                        : {}),
                     }}
                   >
                     {formData.logoUrl ? (
@@ -686,7 +697,8 @@ export default function TemplatesPage() {
                       style={{
                         fontSize: `${formData.documentTitleFontSize}px`,
                         fontFamily: formData.titleFontType,
-                        color: formData.titleColor,
+                        color: isBanner ? theme.bannerInk : formData.titleColor,
+                        letterSpacing: isBanner ? "2px" : undefined,
                         margin: 0,
                       }}
                     >
@@ -695,8 +707,9 @@ export default function TemplatesPage() {
                     <div style={{ display: "flex", gap: "10px" }}>
                       <div
                         style={{
-                          border: "2px solid #000",
+                          border: `2px solid ${isBanner ? theme.bannerInk : theme.ink}`,
                           padding: "8px 12px",
+                          color: isBanner ? theme.bannerInk : theme.ink,
                         }}
                       >
                         <div
@@ -711,8 +724,9 @@ export default function TemplatesPage() {
                       </div>
                       <div
                         style={{
-                          border: "2px solid #000",
+                          border: `2px solid ${isBanner ? theme.bannerInk : theme.ink}`,
                           padding: "8px 12px",
+                          color: isBanner ? theme.bannerInk : theme.ink,
                         }}
                       >
                         <div
@@ -807,14 +821,16 @@ export default function TemplatesPage() {
                     <thead>
                       <tr
                         style={{
-                          borderBottom: "2px solid #000",
-                          borderTop: "2px solid #000",
+                          background: theme.headBg,
+                          color: theme.headInk,
+                          borderBottom: theme.headBg === "#ffffff" ? `2px solid ${theme.ink}` : "none",
+                          borderTop: theme.headBg === "#ffffff" ? `2px solid ${theme.ink}` : "none",
                         }}
                       >
                         <th
                           style={{
                             textAlign: "left",
-                            padding: "8px 0",
+                            padding: "8px 6px",
                             fontWeight: "bold",
                           }}
                         >
@@ -954,7 +970,8 @@ export default function TemplatesPage() {
                             display: "flex",
                             justifyContent: "space-between",
                             padding: "8px 0",
-                            borderTop: "2px solid #000",
+                            borderTop: `2px solid ${theme.accent}`,
+                            color: theme.accent,
                             fontWeight: "bold",
                             fontSize: "14px",
                           }}
