@@ -201,11 +201,24 @@ export default function InvoiceViewPage() {
             }}
           >
             <style>{`
+              * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+              }
               @media print {
                 .no-print { display: none !important; }
+                body * { visibility: hidden; }
+                .invoice-print-area, .invoice-print-area * { visibility: visible; }
+                .invoice-print-area {
+                  position: absolute;
+                  left: 0;
+                  top: 0;
+                  width: 100%;
+                }
               }
             `}</style>
-            <div style={{ maxWidth: "800px", margin: "0 auto", fontFamily: theme.fontFamily }}>
+            <div className="invoice-print-area" style={{ maxWidth: "800px", margin: "0 auto", fontFamily: theme.fontFamily }}>
               <div
                 style={{
                   display: "flex",
