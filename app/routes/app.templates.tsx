@@ -646,17 +646,6 @@ export default function TemplatesPage() {
                   print-color-adjust: exact !important;
                   color-adjust: exact !important;
                 }
-                @media print {
-                  body * { visibility: hidden; }
-                  .template-print-area, .template-print-area * { visibility: visible; }
-                  .template-print-area {
-                    position: absolute;
-                    left: 0;
-                    top: 0;
-                    width: 100%;
-                    border: none !important;
-                  }
-                }
               `}</style>
               <div
                 className="template-print-area"

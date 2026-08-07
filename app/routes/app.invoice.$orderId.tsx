@@ -208,14 +208,6 @@ export default function InvoiceViewPage() {
               }
               @media print {
                 .no-print { display: none !important; }
-                body * { visibility: hidden; }
-                .invoice-print-area, .invoice-print-area * { visibility: visible; }
-                .invoice-print-area {
-                  position: absolute;
-                  left: 0;
-                  top: 0;
-                  width: 100%;
-                }
               }
             `}</style>
             <div className="invoice-print-area" style={{ maxWidth: "800px", margin: "0 auto", fontFamily: theme.fontFamily }}>
