@@ -18,6 +18,7 @@ export interface TemplateSettings {
   logoUrl?: string;
   displayOrderNo?: boolean;
   displayOrderDate?: boolean;
+  templateStyle?: string;
 }
 
 const DEFAULT_SETTINGS: Required<TemplateSettings> = {
@@ -30,6 +31,21 @@ const DEFAULT_SETTINGS: Required<TemplateSettings> = {
   logoUrl: "",
   displayOrderNo: true,
   displayOrderDate: true,
+  templateStyle: "slim",
+};
+
+// Theme colors matching template-themes.ts
+const THEMES: Record<string, { bannerBg: string; bannerInk: string; headBg: string; headInk: string; accent: string; isBanner: boolean }> = {
+  slim: { bannerBg: "#ffffff", bannerInk: "#1a1a1a", headBg: "#ffffff", headInk: "#1a1a1a", accent: "#1a1a1a", isBanner: false },
+  pure: { bannerBg: "#ffffff", bannerInk: "#1a1a1a", headBg: "#f4f4f4", headInk: "#1a1a1a", accent: "#1a1a1a", isBanner: false },
+  agile: { bannerBg: "#ffffff", bannerInk: "#1a1a1a", headBg: "#2f6f4f", headInk: "#ffffff", accent: "#2f6f4f", isBanner: false },
+  aqua: { bannerBg: "#ffffff", bannerInk: "#0e7c86", headBg: "#e6f4f5", headInk: "#0e7c86", accent: "#0e7c86", isBanner: false },
+  aurora: { bannerBg: "#26413c", bannerInk: "#ffffff", headBg: "#26413c", headInk: "#ffffff", accent: "#26413c", isBanner: true },
+  epoch: { bannerBg: "#111111", bannerInk: "#ffffff", headBg: "#111111", headInk: "#ffffff", accent: "#111111", isBanner: true },
+  leo: { bannerBg: "#1a1a1a", bannerInk: "#ffffff", headBg: "#1a1a1a", headInk: "#ffffff", accent: "#8a5a2b", isBanner: true },
+  ocean: { bannerBg: "#0d1b2a", bannerInk: "#ffffff", headBg: "#0d1b2a", headInk: "#ffffff", accent: "#0d5c75", isBanner: true },
+  retro: { bannerBg: "#191919", bannerInk: "#f5e9d6", headBg: "#191919", headInk: "#f5e9d6", accent: "#c0392b", isBanner: true },
+  rhythm: { bannerBg: "#ffffff", bannerInk: "#5b3ea6", headBg: "#f0ecfa", headInk: "#5b3ea6", accent: "#5b3ea6", isBanner: false },
 };
 
 const styles = StyleSheet.create({
@@ -130,26 +146,34 @@ export const InvoiceTemplate: React.FC<{
   settings?: TemplateSettings;
 }> = ({ data, settings }) => {
   const s = { ...DEFAULT_SETTINGS, ...settings };
+  const theme = THEMES[s.templateStyle] || THEMES.slim;
   return (
   <Document>
     <Page size="A4" style={styles.page}>
-      <View style={styles.header}>
+      <View style={[
+        styles.header,
+        theme.isBanner ? {
+          backgroundColor: theme.bannerBg,
+          padding: 20,
+          borderRadius: 4,
+        } : {}
+      ]}>
         {s.logoUrl ? <Image style={styles.logo} src={s.logoUrl} /> : null}
         <Text
           style={[
             styles.title,
-            { color: s.titleColor, fontSize: s.documentTitleFontSize },
+            { color: theme.isBanner ? theme.bannerInk : s.titleColor, fontSize: s.documentTitleFontSize },
           ]}
         >
           {s.documentTitle}
         </Text>
         {s.displayOrderNo ? (
-          <Text style={{ color: s.labelColor, fontSize: s.labelFontSize }}>
+          <Text style={{ color: theme.isBanner ? theme.bannerInk : s.labelColor, fontSize: s.labelFontSize }}>
             Order #{data.orderNumber}
           </Text>
         ) : null}
         {s.displayOrderDate ? (
-          <Text style={{ color: s.labelColor, fontSize: s.labelFontSize }}>
+          <Text style={{ color: theme.isBanner ? theme.bannerInk : s.labelColor, fontSize: s.labelFontSize }}>
             Date: {new Date(data.createdAt).toLocaleDateString()}
           </Text>
         ) : null}
@@ -181,11 +205,18 @@ export const InvoiceTemplate: React.FC<{
       </View>
 
       <View style={styles.table}>
-        <View style={styles.tableHeader}>
-          <Text style={styles.col1}>Item</Text>
-          <Text style={styles.col2}>Qty</Text>
-          <Text style={styles.col3}>Price</Text>
-          <Text style={styles.col4}>Total</Text>
+        <View style={[
+          styles.tableHeader,
+          {
+            backgroundColor: theme.headBg,
+            color: theme.headInk,
+            borderBottomColor: theme.headBg === "#ffffff" ? "#000" : theme.headBg,
+          }
+        ]}>
+          <Text style={[styles.col1, { color: theme.headInk }]}>Item</Text>
+          <Text style={[styles.col2, { color: theme.headInk }]}>Qty</Text>
+          <Text style={[styles.col3, { color: theme.headInk }]}>Price</Text>
+          <Text style={[styles.col4, { color: theme.headInk }]}>Total</Text>
         </View>
         {data.lineItems.map((item, index) => (
           <View key={index} style={styles.tableRow}>
@@ -214,9 +245,18 @@ export const InvoiceTemplate: React.FC<{
             {data.currency} {data.tax}
           </Text>
         </View>
-        <View style={[styles.totalRow, styles.bold]}>
-          <Text>Total:</Text>
-          <Text>
+        <View style={[
+          styles.totalRow,
+          styles.bold,
+          theme.isBanner ? {
+            backgroundColor: theme.headBg,
+            color: theme.headInk,
+            padding: 8,
+            borderRadius: 4,
+          } : {}
+        ]}>
+          <Text style={theme.isBanner ? { color: theme.headInk } : { color: theme.accent }}>Total:</Text>
+          <Text style={theme.isBanner ? { color: theme.headInk } : { color: theme.accent }}>
             {data.currency} {data.total}
           </Text>
         </View>

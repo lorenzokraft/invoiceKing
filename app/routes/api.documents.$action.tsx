@@ -128,6 +128,7 @@ async function loadTemplateSettings(
     logoUrl: config.logoUrl || undefined,
     displayOrderNo: config.displayOrderNo ?? true,
     displayOrderDate: config.displayOrderDate ?? true,
+    templateStyle: config.templateStyle || "slim",
   };
 }
 
