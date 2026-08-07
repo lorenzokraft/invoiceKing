@@ -419,18 +419,29 @@ export default function InvoiceViewPage() {
                 </div>
                 <div
                   style={{
-                    borderTop: `2px solid ${theme.accent}`,
-                    paddingTop: "8px",
+                    padding: "12px 16px",
                     marginTop: "8px",
-                    color: theme.accent,
+                    ...(isBanner
+                      ? {
+                          background: theme.headBg,
+                          color: theme.headInk,
+                          borderRadius: "4px",
+                        }
+                      : {
+                          borderTop: `2px solid ${theme.accent}`,
+                          paddingTop: "8px",
+                          paddingLeft: 0,
+                          paddingRight: 0,
+                          color: theme.accent,
+                        }),
+                    display: "flex",
+                    justifyContent: "space-between",
+                    fontWeight: 700,
+                    fontSize: "18px",
                   }}
                 >
-                  <Text as="span" variant="headingMd" fontWeight="bold">
-                    TOTAL :{" "}
-                  </Text>
-                  <Text as="span" variant="headingMd" fontWeight="bold">
-                    {currency} {total}
-                  </Text>
+                  <span>TOTAL :</span>
+                  <span>{currency} {total}</span>
                 </div>
               </div>
 

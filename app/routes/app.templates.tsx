@@ -675,6 +675,7 @@ export default function TemplatesPage() {
                           maxWidth: "120px",
                           maxHeight: "60px",
                           objectFit: "contain",
+                          ...(isBanner ? { filter: "brightness(0) invert(1)" } : {}),
                         }}
                       />
                     ) : (
@@ -969,9 +970,18 @@ export default function TemplatesPage() {
                           style={{
                             display: "flex",
                             justifyContent: "space-between",
-                            padding: "8px 0",
-                            borderTop: `2px solid ${theme.accent}`,
-                            color: theme.accent,
+                            padding: "8px 12px",
+                            marginTop: "4px",
+                            ...(isBanner
+                              ? {
+                                  background: theme.headBg,
+                                  color: theme.headInk,
+                                  borderRadius: "4px",
+                                }
+                              : {
+                                  borderTop: `2px solid ${theme.accent}`,
+                                  color: theme.accent,
+                                }),
                             fontWeight: "bold",
                             fontSize: "14px",
                           }}
