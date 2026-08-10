@@ -140,8 +140,26 @@ export default function InvoiceViewPage() {
   };
 
   const handleDownload = async () => {
-    const url = `/api/documents/download?type=invoice&orderId=${encodeURIComponent(order.id)}&shop=${encodeURIComponent(shop)}`;
-    window.open(url, "_blank");
+    try {
+      const url = `/api/documents/download?type=invoice&orderId=${encodeURIComponent(order.id)}&shop=${encodeURIComponent(shop)}`;
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error('Download failed');
+      }
+      
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `invoice-${order.name}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+    } catch (err) {
+      shopify.toast.show('Failed to download invoice');
+    }
   };
 
   const handleSend = async () => {

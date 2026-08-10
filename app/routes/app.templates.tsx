@@ -73,31 +73,37 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     });
   }
 
+  // Refetch to get the latest saved settings
+  const updatedTemplate = await db.template.findFirst({
+    where: { shop, type: "INVOICE" },
+  });
+  const finalSettings = updatedTemplate?.config as any;
+
   return json({
     templateType: "invoice",
-    logoUrl: savedSettings?.logoUrl || "",
-    titleFontType: savedSettings?.titleFontType || "Bitter",
-    titleFontSize: savedSettings?.titleFontSize || 14,
-    titleColor: savedSettings?.titleColor || "#000000",
-    labelFontType: savedSettings?.labelFontType || "Bitter",
-    labelFontSize: savedSettings?.labelFontSize || 12,
-    labelColor: savedSettings?.labelColor || "#6d6f80",
-    documentTitleFontSize: savedSettings?.documentTitleFontSize || 36,
-    productVariant: savedSettings?.productVariant || "Multiple Line",
-    productWeight: savedSettings?.productWeight || "kg",
-    productImage: savedSettings?.productImage || "Do not display",
-    productSortType: savedSettings?.productSortType || "Default",
-    facebookUrl: savedSettings?.facebookUrl || "",
-    instagramUrl: savedSettings?.instagramUrl || "",
-    xUrl: savedSettings?.xUrl || "",
-    documentTitle: savedSettings?.documentTitle || "INVOICE",
-    documentFilename: savedSettings?.documentFilename || "invoice-{{order.name}}",
-    displayOrderNo: savedSettings?.displayOrderNo ?? true,
-    displayInvoiceNo: savedSettings?.displayInvoiceNo ?? true,
-    displayOrderDate: savedSettings?.displayOrderDate ?? true,
-    footerMessage: savedSettings?.footerMessage || "Thanks for your business...",
-    language: savedSettings?.language || "en",
-    templateStyle: styleParam || savedSettings?.templateStyle || "slim",
+    logoUrl: finalSettings?.logoUrl || "",
+    titleFontType: finalSettings?.titleFontType || "Bitter",
+    titleFontSize: finalSettings?.titleFontSize || 14,
+    titleColor: finalSettings?.titleColor || "#000000",
+    labelFontType: finalSettings?.labelFontType || "Bitter",
+    labelFontSize: finalSettings?.labelFontSize || 12,
+    labelColor: finalSettings?.labelColor || "#6d6f80",
+    documentTitleFontSize: finalSettings?.documentTitleFontSize || 36,
+    productVariant: finalSettings?.productVariant || "Multiple Line",
+    productWeight: finalSettings?.productWeight || "kg",
+    productImage: finalSettings?.productImage || "Do not display",
+    productSortType: finalSettings?.productSortType || "Default",
+    facebookUrl: finalSettings?.facebookUrl || "",
+    instagramUrl: finalSettings?.instagramUrl || "",
+    xUrl: finalSettings?.xUrl || "",
+    documentTitle: finalSettings?.documentTitle || "INVOICE",
+    documentFilename: finalSettings?.documentFilename || "invoice-{{order.name}}",
+    displayOrderNo: finalSettings?.displayOrderNo ?? true,
+    displayInvoiceNo: finalSettings?.displayInvoiceNo ?? true,
+    displayOrderDate: finalSettings?.displayOrderDate ?? true,
+    footerMessage: finalSettings?.footerMessage || "Thanks for your business...",
+    language: finalSettings?.language || "en",
+    templateStyle: styleParam || finalSettings?.templateStyle || "slim",
   });
 };
 

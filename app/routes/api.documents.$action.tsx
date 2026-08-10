@@ -264,6 +264,14 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
       : `packing-slip-${orderData.orderNumber}.pdf`;
 
   const templateSettings = await loadTemplateSettings(shop, type);
+  
+  console.log('[PDF Generation]', {
+    shop,
+    type,
+    templateStyle: templateSettings.templateStyle,
+    documentTitle: templateSettings.documentTitle,
+    orderNumber: orderData.orderNumber,
+  });
 
   const stream = await renderToStream(
     <Template data={orderData} settings={templateSettings} />,
