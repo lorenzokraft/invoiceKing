@@ -30,6 +30,11 @@ const ORDER_QUERY = `#graphql
           amount
         }
       }
+      totalShippingPriceSet {
+        shopMoney {
+          amount
+        }
+      }
       customer {
         displayName
         email
@@ -42,11 +47,20 @@ const ORDER_QUERY = `#graphql
         zip
         country
       }
+      billingAddress {
+        address1
+        address2
+        city
+        province
+        zip
+        country
+      }
       lineItems(first: 100) {
         edges {
           node {
             title
             quantity
+            sku
             originalUnitPriceSet {
               shopMoney {
                 amount
@@ -83,15 +97,20 @@ async function fetchOrderData(admin: any, orderId: string) {
       name: order.customer?.displayName || "Guest",
       email: order.customer?.email || "",
       shippingAddress: order.shippingAddress,
+      billingAddress: order.billingAddress,
     },
     lineItems: order.lineItems.edges.map(({ node }: any) => ({
       title: node.title,
       quantity: node.quantity,
+      sku: node.sku || "",
       price: parseFloat(node.originalUnitPriceSet.shopMoney.amount).toFixed(2),
       total: parseFloat(node.originalTotalSet.shopMoney.amount).toFixed(2),
     })),
     subtotal: parseFloat(order.subtotalPriceSet.shopMoney.amount).toFixed(2),
     tax: parseFloat(order.totalTaxSet.shopMoney.amount).toFixed(2),
+    shipping: parseFloat(
+      order.totalShippingPriceSet?.shopMoney?.amount || "0",
+    ).toFixed(2),
     total: parseFloat(order.totalPriceSet.shopMoney.amount).toFixed(2),
     currency: order.totalPriceSet.shopMoney.currencyCode,
     storeName: "Your Store",

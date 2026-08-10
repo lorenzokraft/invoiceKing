@@ -53,65 +53,143 @@ const styles = StyleSheet.create({
     padding: 40,
     fontSize: 10,
     fontFamily: "Helvetica",
+    color: "#1a1a1a",
   },
   header: {
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 10,
-  },
-  section: {
-    marginBottom: 15,
-  },
-  row: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 30,
+  },
+  headerLeft: {
+    flexDirection: "column",
+  },
+  headerRight: {
+    flexDirection: "column",
+    alignItems: "flex-end",
+  },
+  title: {
+    fontSize: 28,
+    fontFamily: "Helvetica-Bold",
+  },
+  metaBox: {
+    borderWidth: 2,
+    borderColor: "#1a1a1a",
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    marginBottom: 8,
+    alignItems: "flex-end",
+    minWidth: 110,
+  },
+  metaLabel: {
+    fontSize: 9,
+    fontFamily: "Helvetica-Bold",
+    marginBottom: 2,
+  },
+  metaValue: {
+    fontSize: 9,
+  },
+  addressRow: {
+    flexDirection: "row",
+    marginBottom: 25,
+  },
+  addressCol: {
+    width: "33%",
+    paddingRight: 10,
+  },
+  addressLabel: {
+    fontSize: 9,
+    fontFamily: "Helvetica-Bold",
     marginBottom: 5,
+  },
+  addressText: {
+    fontSize: 9,
+    marginBottom: 2,
   },
   table: {
     marginTop: 10,
   },
   tableHeader: {
     flexDirection: "row",
-    borderBottomWidth: 1,
-    borderBottomColor: "#000",
-    paddingBottom: 5,
-    marginBottom: 5,
-    fontWeight: "bold",
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    fontFamily: "Helvetica-Bold",
   },
   tableRow: {
     flexDirection: "row",
-    paddingVertical: 5,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e1e3e5",
   },
-  col1: { width: "50%" },
-  col2: { width: "15%", textAlign: "right" },
-  col3: { width: "15%", textAlign: "right" },
-  col4: { width: "20%", textAlign: "right" },
+  colTitle: { width: "32%" },
+  colSku: { width: "14%" },
+  colQty: { width: "12%", textAlign: "center" },
+  colPrice: { width: "21%", textAlign: "right" },
+  colTotal: { width: "21%", textAlign: "right" },
   totals: {
     marginTop: 20,
     alignItems: "flex-end",
   },
   totalRow: {
     flexDirection: "row",
-    width: 200,
+    justifyContent: "flex-end",
+    marginBottom: 6,
+  },
+  totalLabel: {
+    fontFamily: "Helvetica-Bold",
+    fontSize: 10,
+  },
+  totalValue: {
+    fontSize: 10,
+    marginLeft: 6,
+  },
+  grandTotalRow: {
+    flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 5,
+    width: "100%",
+    marginTop: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+  },
+  grandTotalText: {
+    fontSize: 14,
+    fontFamily: "Helvetica-Bold",
   },
   bold: {
-    fontWeight: "bold",
+    fontFamily: "Helvetica-Bold",
   },
   logo: {
-    width: 80,
-    height: 80,
+    width: 70,
+    height: 70,
     objectFit: "contain",
-    marginBottom: 10,
+    marginBottom: 8,
   },
   footer: {
-    marginTop: 30,
+    marginTop: 40,
+    alignItems: "center",
+  },
+  footerTitle: {
+    fontSize: 11,
+    fontFamily: "Helvetica-Bold",
+    marginBottom: 6,
+  },
+  footerText: {
+    fontSize: 9,
+    color: "#6d6f80",
     textAlign: "center",
+    maxWidth: 400,
   },
 });
+
+interface Address {
+  address1?: string;
+  address2?: string;
+  city?: string;
+  province?: string;
+  zip?: string;
+  country?: string;
+}
 
 interface OrderData {
   orderNumber: string;
@@ -119,27 +197,52 @@ interface OrderData {
   customer: {
     name: string;
     email: string;
-    shippingAddress?: {
-      address1?: string;
-      address2?: string;
-      city?: string;
-      province?: string;
-      zip?: string;
-      country?: string;
-    };
+    shippingAddress?: Address;
+    billingAddress?: Address;
   };
   lineItems: Array<{
     title: string;
     quantity: number;
+    sku?: string;
     price: string;
     total: string;
   }>;
   subtotal: string;
   tax: string;
+  shipping?: string;
   total: string;
   currency: string;
   storeName: string;
 }
+
+const AddressBlock: React.FC<{
+  label: string;
+  name: string;
+  address?: Address;
+  email?: string;
+}> = ({ label, name, address, email }) => (
+  <View style={styles.addressCol}>
+    <Text style={styles.addressLabel}>{label}</Text>
+    <Text style={styles.addressText}>{name}</Text>
+    {email ? <Text style={styles.addressText}>{email}</Text> : null}
+    {address?.address1 ? (
+      <Text style={styles.addressText}>{address.address1}</Text>
+    ) : null}
+    {address?.address2 ? (
+      <Text style={styles.addressText}>{address.address2}</Text>
+    ) : null}
+    {address?.city ? (
+      <Text style={styles.addressText}>
+        {address.city}
+        {address.province ? `, ${address.province}` : ""}
+        {address.zip ? ` ${address.zip}` : ""}
+      </Text>
+    ) : null}
+    {address?.country ? (
+      <Text style={styles.addressText}>{address.country}</Text>
+    ) : null}
+  </View>
+);
 
 export const InvoiceTemplate: React.FC<{
   data: OrderData;
@@ -147,6 +250,7 @@ export const InvoiceTemplate: React.FC<{
 }> = ({ data, settings }) => {
   const s = { ...DEFAULT_SETTINGS, ...settings };
   const theme = THEMES[s.templateStyle] || THEMES.slim;
+  const inkColor = theme.isBanner ? theme.bannerInk : s.titleColor;
   return (
   <Document>
     <Page size="A4" style={styles.page}>
@@ -155,77 +259,79 @@ export const InvoiceTemplate: React.FC<{
         theme.isBanner ? {
           backgroundColor: theme.bannerBg,
           padding: 20,
-          borderRadius: 4,
+          borderRadius: 6,
         } : {}
       ]}>
-        {s.logoUrl ? <Image style={styles.logo} src={s.logoUrl} /> : null}
-        <Text
-          style={[
-            styles.title,
-            { color: theme.isBanner ? theme.bannerInk : s.titleColor, fontSize: s.documentTitleFontSize },
-          ]}
-        >
-          {s.documentTitle}
-        </Text>
-        {s.displayOrderNo ? (
-          <Text style={{ color: theme.isBanner ? theme.bannerInk : s.labelColor, fontSize: s.labelFontSize }}>
-            Order #{data.orderNumber}
+        <View style={styles.headerLeft}>
+          {s.logoUrl ? <Image style={styles.logo} src={s.logoUrl} /> : null}
+          <Text
+            style={[
+              styles.title,
+              { color: inkColor, fontSize: Math.min(s.documentTitleFontSize, 30) },
+            ]}
+          >
+            {s.documentTitle}
           </Text>
-        ) : null}
-        {s.displayOrderDate ? (
-          <Text style={{ color: theme.isBanner ? theme.bannerInk : s.labelColor, fontSize: s.labelFontSize }}>
-            Date: {new Date(data.createdAt).toLocaleDateString()}
-          </Text>
-        ) : null}
+        </View>
+        <View style={styles.headerRight}>
+          {s.displayOrderNo ? (
+            <View style={[styles.metaBox, { borderColor: inkColor }]}>
+              <Text style={[styles.metaLabel, { color: inkColor }]}>ORDER NO</Text>
+              <Text style={[styles.metaValue, { color: inkColor }]}>{data.orderNumber}</Text>
+            </View>
+          ) : null}
+          {s.displayOrderDate ? (
+            <View style={[styles.metaBox, { borderColor: inkColor }]}>
+              <Text style={[styles.metaLabel, { color: inkColor }]}>ORDER DATE</Text>
+              <Text style={[styles.metaValue, { color: inkColor }]}>
+                {new Date(data.createdAt).toLocaleDateString()}
+              </Text>
+            </View>
+          ) : null}
+        </View>
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.bold}>From:</Text>
-        <Text>{data.storeName}</Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.bold}>Bill To:</Text>
-        <Text>{data.customer.name}</Text>
-        <Text>{data.customer.email}</Text>
-        {data.customer.shippingAddress && (
-          <>
-            <Text>{data.customer.shippingAddress.address1}</Text>
-            {data.customer.shippingAddress.address2 && (
-              <Text>{data.customer.shippingAddress.address2}</Text>
-            )}
-            <Text>
-              {data.customer.shippingAddress.city},{" "}
-              {data.customer.shippingAddress.province}{" "}
-              {data.customer.shippingAddress.zip}
-            </Text>
-            <Text>{data.customer.shippingAddress.country}</Text>
-          </>
-        )}
+      <View style={styles.addressRow}>
+        <AddressBlock
+          label="SHIPPING ADDRESS"
+          name={data.customer.name}
+          address={data.customer.shippingAddress}
+        />
+        <AddressBlock
+          label="BILLING ADDRESS"
+          name={data.customer.name}
+          address={data.customer.billingAddress || data.customer.shippingAddress}
+        />
+        <AddressBlock
+          label="CUSTOMER ADDRESS"
+          name={data.customer.name}
+          email={data.customer.email}
+        />
       </View>
 
       <View style={styles.table}>
         <View style={[
           styles.tableHeader,
-          {
-            backgroundColor: theme.headBg,
-            color: theme.headInk,
-            borderBottomColor: theme.headBg === "#ffffff" ? "#000" : theme.headBg,
-          }
+          { backgroundColor: theme.headBg },
+          theme.headBg === "#ffffff"
+            ? { borderBottomWidth: 1, borderBottomColor: "#1a1a1a" }
+            : {},
         ]}>
-          <Text style={[styles.col1, { color: theme.headInk }]}>Item</Text>
-          <Text style={[styles.col2, { color: theme.headInk }]}>Qty</Text>
-          <Text style={[styles.col3, { color: theme.headInk }]}>Price</Text>
-          <Text style={[styles.col4, { color: theme.headInk }]}>Total</Text>
+          <Text style={[styles.colTitle, { color: theme.headInk }]}>TITLE</Text>
+          <Text style={[styles.colSku, { color: theme.headInk }]}>SKU</Text>
+          <Text style={[styles.colQty, { color: theme.headInk }]}>QTY</Text>
+          <Text style={[styles.colPrice, { color: theme.headInk }]}>UNIT PRICE</Text>
+          <Text style={[styles.colTotal, { color: theme.headInk }]}>TOTAL</Text>
         </View>
         {data.lineItems.map((item, index) => (
           <View key={index} style={styles.tableRow}>
-            <Text style={styles.col1}>{item.title}</Text>
-            <Text style={styles.col2}>{item.quantity}</Text>
-            <Text style={styles.col3}>
+            <Text style={styles.colTitle}>{item.title}</Text>
+            <Text style={styles.colSku}>{item.sku || "—"}</Text>
+            <Text style={styles.colQty}>{item.quantity}</Text>
+            <Text style={styles.colPrice}>
               {data.currency} {item.price}
             </Text>
-            <Text style={styles.col4}>
+            <Text style={styles.colTotal}>
               {data.currency} {item.total}
             </Text>
           </View>
@@ -234,29 +340,48 @@ export const InvoiceTemplate: React.FC<{
 
       <View style={styles.totals}>
         <View style={styles.totalRow}>
-          <Text>Subtotal:</Text>
-          <Text>
+          <Text style={styles.totalLabel}>SUB TOTAL :</Text>
+          <Text style={styles.totalValue}>
             {data.currency} {data.subtotal}
           </Text>
         </View>
+        {data.shipping !== undefined ? (
+          <View style={styles.totalRow}>
+            <Text style={styles.totalLabel}>SHIPPING :</Text>
+            <Text style={styles.totalValue}>
+              {data.currency} {data.shipping}
+            </Text>
+          </View>
+        ) : null}
         <View style={styles.totalRow}>
-          <Text>Tax:</Text>
-          <Text>
+          <Text style={styles.totalLabel}>TAX :</Text>
+          <Text style={styles.totalValue}>
             {data.currency} {data.tax}
           </Text>
         </View>
         <View style={[
-          styles.totalRow,
-          styles.bold,
-          theme.isBanner ? {
-            backgroundColor: theme.headBg,
-            color: theme.headInk,
-            padding: 8,
-            borderRadius: 4,
-          } : {}
+          styles.grandTotalRow,
+          theme.isBanner
+            ? {
+                backgroundColor: theme.headBg,
+                borderRadius: 4,
+              }
+            : {
+                borderTopWidth: 2,
+                borderTopColor: theme.accent,
+                paddingHorizontal: 0,
+              },
         ]}>
-          <Text style={theme.isBanner ? { color: theme.headInk } : { color: theme.accent }}>Total:</Text>
-          <Text style={theme.isBanner ? { color: theme.headInk } : { color: theme.accent }}>
+          <Text style={[
+            styles.grandTotalText,
+            { color: theme.isBanner ? theme.headInk : theme.accent },
+          ]}>
+            TOTAL :
+          </Text>
+          <Text style={[
+            styles.grandTotalText,
+            { color: theme.isBanner ? theme.headInk : theme.accent },
+          ]}>
             {data.currency} {data.total}
           </Text>
         </View>
@@ -264,7 +389,12 @@ export const InvoiceTemplate: React.FC<{
 
       {s.footerMessage ? (
         <View style={styles.footer}>
-          <Text style={styles.bold}>{s.footerMessage}</Text>
+          <Text style={styles.footerTitle}>{s.footerMessage}</Text>
+          <Text style={styles.footerText}>
+            We truly appreciate your trust, and we'll do our best to continue to
+            give you the service you deserve. We look forward to serving you
+            again.
+          </Text>
         </View>
       ) : null}
     </Page>
@@ -278,74 +408,98 @@ export const PackingSlipTemplate: React.FC<{
 }> = ({ data, settings }) => {
   const s = {
     ...DEFAULT_SETTINGS,
-    documentTitle: "PACKING SLIP",
     ...settings,
+    documentTitle: "PACKING SLIP",
   };
+  const theme = THEMES[s.templateStyle] || THEMES.slim;
+  const inkColor = theme.isBanner ? theme.bannerInk : s.titleColor;
   return (
   <Document>
     <Page size="A4" style={styles.page}>
-      <View style={styles.header}>
-        {s.logoUrl ? <Image style={styles.logo} src={s.logoUrl} /> : null}
-        <Text
-          style={[
-            styles.title,
-            { color: s.titleColor, fontSize: s.documentTitleFontSize },
-          ]}
-        >
-          {s.documentTitle}
-        </Text>
-        {s.displayOrderNo ? (
-          <Text style={{ color: s.labelColor, fontSize: s.labelFontSize }}>
-            Order #{data.orderNumber}
+      <View style={[
+        styles.header,
+        theme.isBanner ? {
+          backgroundColor: theme.bannerBg,
+          padding: 20,
+          borderRadius: 6,
+        } : {}
+      ]}>
+        <View style={styles.headerLeft}>
+          {s.logoUrl ? <Image style={styles.logo} src={s.logoUrl} /> : null}
+          <Text
+            style={[
+              styles.title,
+              { color: inkColor, fontSize: Math.min(s.documentTitleFontSize, 30) },
+            ]}
+          >
+            {s.documentTitle}
           </Text>
-        ) : null}
-        {s.displayOrderDate ? (
-          <Text style={{ color: s.labelColor, fontSize: s.labelFontSize }}>
-            Date: {new Date(data.createdAt).toLocaleDateString()}
-          </Text>
-        ) : null}
+        </View>
+        <View style={styles.headerRight}>
+          {s.displayOrderNo ? (
+            <View style={[styles.metaBox, { borderColor: inkColor }]}>
+              <Text style={[styles.metaLabel, { color: inkColor }]}>ORDER NO</Text>
+              <Text style={[styles.metaValue, { color: inkColor }]}>{data.orderNumber}</Text>
+            </View>
+          ) : null}
+          {s.displayOrderDate ? (
+            <View style={[styles.metaBox, { borderColor: inkColor }]}>
+              <Text style={[styles.metaLabel, { color: inkColor }]}>ORDER DATE</Text>
+              <Text style={[styles.metaValue, { color: inkColor }]}>
+                {new Date(data.createdAt).toLocaleDateString()}
+              </Text>
+            </View>
+          ) : null}
+        </View>
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.bold}>From:</Text>
-        <Text>{data.storeName}</Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.bold}>Ship To:</Text>
-        <Text>{data.customer.name}</Text>
-        {data.customer.shippingAddress && (
-          <>
-            <Text>{data.customer.shippingAddress.address1}</Text>
-            {data.customer.shippingAddress.address2 && (
-              <Text>{data.customer.shippingAddress.address2}</Text>
-            )}
-            <Text>
-              {data.customer.shippingAddress.city},{" "}
-              {data.customer.shippingAddress.province}{" "}
-              {data.customer.shippingAddress.zip}
-            </Text>
-            <Text>{data.customer.shippingAddress.country}</Text>
-          </>
-        )}
+      <View style={styles.addressRow}>
+        <AddressBlock
+          label="SHIPPING ADDRESS"
+          name={data.customer.name}
+          address={data.customer.shippingAddress}
+        />
+        <AddressBlock
+          label="BILLING ADDRESS"
+          name={data.customer.name}
+          address={data.customer.billingAddress || data.customer.shippingAddress}
+        />
+        <AddressBlock
+          label="CUSTOMER ADDRESS"
+          name={data.customer.name}
+          email={data.customer.email}
+        />
       </View>
 
       <View style={styles.table}>
-        <View style={styles.tableHeader}>
-          <Text style={styles.col1}>Item</Text>
-          <Text style={styles.col2}>Qty</Text>
+        <View style={[
+          styles.tableHeader,
+          { backgroundColor: theme.headBg },
+          theme.headBg === "#ffffff"
+            ? { borderBottomWidth: 1, borderBottomColor: "#1a1a1a" }
+            : {},
+        ]}>
+          <Text style={[styles.colTitle, { color: theme.headInk }]}>TITLE</Text>
+          <Text style={[styles.colSku, { color: theme.headInk }]}>SKU</Text>
+          <Text style={[styles.colQty, { color: theme.headInk }]}>QTY</Text>
         </View>
         {data.lineItems.map((item, index) => (
           <View key={index} style={styles.tableRow}>
-            <Text style={styles.col1}>{item.title}</Text>
-            <Text style={styles.col2}>{item.quantity}</Text>
+            <Text style={styles.colTitle}>{item.title}</Text>
+            <Text style={styles.colSku}>{item.sku || "—"}</Text>
+            <Text style={styles.colQty}>{item.quantity}</Text>
           </View>
         ))}
       </View>
 
       {s.footerMessage ? (
         <View style={styles.footer}>
-          <Text style={styles.bold}>{s.footerMessage}</Text>
+          <Text style={styles.footerTitle}>{s.footerMessage}</Text>
+          <Text style={styles.footerText}>
+            We truly appreciate your trust, and we'll do our best to continue to
+            give you the service you deserve. We look forward to serving you
+            again.
+          </Text>
         </View>
       ) : null}
     </Page>
