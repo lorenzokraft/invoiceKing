@@ -5,6 +5,7 @@ import { InvoiceTemplate, PackingSlipTemplate } from "../lib/pdf-templates";
 import type { TemplateSettings } from "../lib/pdf-templates";
 import db from "../db.server";
 import { DocumentType, DocumentStatus } from "@prisma/client";
+import { logAction } from "../lib/action-log.server";
 
 const FREE_PLAN_MONTHLY_LIMIT = 50;
 
@@ -296,6 +297,14 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     orderData.currency,
     orderData.total,
   );
+
+  await logAction({
+    shop,
+    actionType: action === "print" ? "PRINT" : action === "send" ? "SEND" : "DOWNLOAD",
+    documentType,
+    orderId,
+    orderName: orderData.orderNumber,
+  });
 
   const Template =
     type === "invoice" ? InvoiceTemplate : PackingSlipTemplate;

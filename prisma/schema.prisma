@@ -142,6 +142,26 @@ model Template {
   @@index([shop, type])
 }
 
+enum ActionType {
+  PRINT
+  DOWNLOAD
+  SEND
+  UPLOAD
+}
+
+model ActionLog {
+  id           String       @id @default(cuid())
+  shop         String
+  actionType   ActionType
+  documentType DocumentType
+  orderId      String?
+  orderName    String?
+  createdAt    DateTime     @default(now())
+
+  @@index([shop, createdAt])
+  @@index([shop, actionType, createdAt])
+}
+
 model MonthlyUsage {
   id           String   @id @default(cuid())
   shop         String

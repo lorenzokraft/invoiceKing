@@ -7,6 +7,7 @@ import { PrintIcon, ImportIcon, EmailIcon } from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
+import { logAction } from "../lib/action-log.server";
 import { getTemplateTheme } from "../lib/template-themes";
 
 const ORDER_QUERY = `#graphql
@@ -112,6 +113,18 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const template = await db.template.findFirst({
     where: { shop: session.shop, type: "INVOICE" },
   });
+
+  const url = new URL(request.url);
+  if (url.searchParams.get("print") === "true") {
+    const docType = url.searchParams.get("type") === "packing-slip" ? "PACKING_SLIP" : "INVOICE";
+    await logAction({
+      shop: session.shop,
+      actionType: "PRINT",
+      documentType: docType,
+      orderId,
+      orderName: order.name,
+    });
+  }
 
   return json({
     order,
