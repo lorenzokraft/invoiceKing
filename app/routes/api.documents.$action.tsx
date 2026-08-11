@@ -35,6 +35,16 @@ const ORDER_QUERY = `#graphql
           amount
         }
       }
+      totalReceivedSet {
+        shopMoney {
+          amount
+        }
+      }
+      totalOutstandingSet {
+        shopMoney {
+          amount
+        }
+      }
       customer {
         displayName
         email
@@ -110,6 +120,12 @@ async function fetchOrderData(admin: any, orderId: string) {
     tax: parseFloat(order.totalTaxSet.shopMoney.amount).toFixed(2),
     shipping: parseFloat(
       order.totalShippingPriceSet?.shopMoney?.amount || "0",
+    ).toFixed(2),
+    paid: parseFloat(
+      order.totalReceivedSet?.shopMoney?.amount || "0",
+    ).toFixed(2),
+    amountDue: parseFloat(
+      order.totalOutstandingSet?.shopMoney?.amount || "0",
     ).toFixed(2),
     total: parseFloat(order.totalPriceSet.shopMoney.amount).toFixed(2),
     currency: order.totalPriceSet.shopMoney.currencyCode,

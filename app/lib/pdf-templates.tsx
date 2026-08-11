@@ -62,14 +62,15 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   headerLeft: {
-    flexDirection: "column",
+    flexDirection: "row",
+    alignItems: "center",
   },
   headerRight: {
-    flexDirection: "column",
-    alignItems: "flex-end",
+    flexDirection: "row",
+    alignItems: "center",
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontFamily: "Helvetica-Bold",
   },
   metaBox: {
@@ -77,9 +78,9 @@ const styles = StyleSheet.create({
     borderColor: "#1a1a1a",
     paddingVertical: 6,
     paddingHorizontal: 14,
-    marginBottom: 8,
+    marginLeft: 8,
     alignItems: "flex-end",
-    minWidth: 110,
+    minWidth: 100,
   },
   metaLabel: {
     fontSize: 9,
@@ -160,10 +161,42 @@ const styles = StyleSheet.create({
     fontFamily: "Helvetica-Bold",
   },
   logo: {
-    width: 70,
-    height: 70,
+    width: 55,
+    height: 55,
     objectFit: "contain",
-    marginBottom: 8,
+    marginRight: 12,
+  },
+  paymentBox: {
+    flexDirection: "row",
+    borderWidth: 1,
+    borderColor: "#c4c6c8",
+    borderStyle: "dashed",
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  paymentCell: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRightWidth: 1,
+    borderRightColor: "#c4c6c8",
+    borderRightStyle: "dashed",
+  },
+  paymentCellLast: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  paymentLabel: {
+    fontSize: 9,
+    fontFamily: "Helvetica-Bold",
+  },
+  paymentValue: {
+    fontSize: 11,
   },
   footer: {
     marginTop: 40,
@@ -210,6 +243,8 @@ interface OrderData {
   subtotal: string;
   tax: string;
   shipping?: string;
+  paid?: string;
+  amountDue?: string;
   total: string;
   currency: string;
   storeName: string;
@@ -267,7 +302,7 @@ export const InvoiceTemplate: React.FC<{
           <Text
             style={[
               styles.title,
-              { color: inkColor, fontSize: Math.min(s.documentTitleFontSize, 30) },
+              { color: inkColor, fontSize: Math.min(s.documentTitleFontSize, 24) },
             ]}
           >
             {s.documentTitle}
@@ -429,7 +464,7 @@ export const PackingSlipTemplate: React.FC<{
           <Text
             style={[
               styles.title,
-              { color: inkColor, fontSize: Math.min(s.documentTitleFontSize, 30) },
+              { color: inkColor, fontSize: Math.min(s.documentTitleFontSize, 24) },
             ]}
           >
             {s.documentTitle}
@@ -482,14 +517,90 @@ export const PackingSlipTemplate: React.FC<{
           <Text style={[styles.colTitle, { color: theme.headInk }]}>TITLE</Text>
           <Text style={[styles.colSku, { color: theme.headInk }]}>SKU</Text>
           <Text style={[styles.colQty, { color: theme.headInk }]}>QTY</Text>
+          <Text style={[styles.colPrice, { color: theme.headInk }]}>UNIT PRICE</Text>
+          <Text style={[styles.colTotal, { color: theme.headInk }]}>TOTAL</Text>
         </View>
         {data.lineItems.map((item, index) => (
           <View key={index} style={styles.tableRow}>
             <Text style={styles.colTitle}>{item.title}</Text>
             <Text style={styles.colSku}>{item.sku || "—"}</Text>
             <Text style={styles.colQty}>{item.quantity}</Text>
+            <Text style={styles.colPrice}>
+              {data.currency} {item.price}
+            </Text>
+            <Text style={styles.colTotal}>
+              {data.currency} {item.total}
+            </Text>
           </View>
         ))}
+      </View>
+
+      <View style={styles.totals}>
+        <View style={styles.totalRow}>
+          <Text style={styles.totalLabel}>SUB TOTAL :</Text>
+          <Text style={styles.totalValue}>
+            {data.currency} {data.subtotal}
+          </Text>
+        </View>
+        {data.shipping !== undefined ? (
+          <View style={styles.totalRow}>
+            <Text style={styles.totalLabel}>SHIPPING :</Text>
+            <Text style={styles.totalValue}>
+              {data.currency} {data.shipping}
+            </Text>
+          </View>
+        ) : null}
+        <View style={styles.totalRow}>
+          <Text style={styles.totalLabel}>TAX :</Text>
+          <Text style={styles.totalValue}>
+            {data.currency} {data.tax}
+          </Text>
+        </View>
+        <View style={[
+          styles.grandTotalRow,
+          theme.isBanner
+            ? {
+                backgroundColor: theme.headBg,
+                borderRadius: 4,
+              }
+            : {
+                borderTopWidth: 2,
+                borderTopColor: theme.accent,
+                paddingHorizontal: 0,
+              },
+        ]}>
+          <Text style={[
+            styles.grandTotalText,
+            { color: theme.isBanner ? theme.headInk : theme.accent },
+          ]}>
+            TOTAL :
+          </Text>
+          <Text style={[
+            styles.grandTotalText,
+            { color: theme.isBanner ? theme.headInk : theme.accent },
+          ]}>
+            {data.currency} {data.total}
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.paymentBox}>
+        <View style={styles.paymentCell}>
+          <Text style={styles.paymentLabel}>PAID</Text>
+        </View>
+        <View style={styles.paymentCell}>
+          <Text style={styles.paymentValue}>
+            {data.currency} {data.paid || "0.00"}
+          </Text>
+        </View>
+        <View style={styles.paymentCell}>
+          <Text style={styles.paymentLabel}>AMOUNT DUE</Text>
+        </View>
+        <View style={styles.paymentCellLast}>
+          <Text style={styles.paymentValue}>
+            {data.currency} {data.amountDue || "0.00"}
+          </Text>
+        </View>
       </View>
 
       {s.footerMessage ? (

@@ -36,6 +36,16 @@ const ORDER_QUERY = `#graphql
           amount
         }
       }
+      totalReceivedSet {
+        shopMoney {
+          amount
+        }
+      }
+      totalOutstandingSet {
+        shopMoney {
+          amount
+        }
+      }
       customer {
         displayName
         email
@@ -190,6 +200,12 @@ export default function InvoiceViewPage() {
   const shipping = parseFloat(order.totalShippingPriceSet.shopMoney.amount).toFixed(2);
   const total = parseFloat(order.totalPriceSet.shopMoney.amount).toFixed(2);
   const currency = order.totalPriceSet.shopMoney.currencyCode;
+  const paid = parseFloat(
+    order.totalReceivedSet?.shopMoney?.amount || "0",
+  ).toFixed(2);
+  const amountDue = parseFloat(
+    order.totalOutstandingSet?.shopMoney?.amount || "0",
+  ).toFixed(2);
 
   return (
     <Page fullWidth>
@@ -245,16 +261,15 @@ export default function InvoiceViewPage() {
                     : {}),
                 }}
               >
-                <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
                   {logoUrl && (
                     <img
                       src={logoUrl}
                       alt="Store logo"
                       style={{
-                        maxWidth: "120px",
+                        maxWidth: "80px",
                         maxHeight: "80px",
                         objectFit: "contain",
-                        marginBottom: "12px",
                         display: "block",
                         ...(isBanner ? { filter: "brightness(0) invert(1)" } : {}),
                       }}
@@ -271,12 +286,12 @@ export default function InvoiceViewPage() {
                     {documentTitle}
                   </span>
                 </div>
-                <div style={{ textAlign: "right" }}>
+                <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                   <div
                     style={{
                       border: `2px solid ${isBanner ? theme.bannerInk : theme.ink}`,
                       padding: "8px 16px",
-                      marginBottom: "8px",
+                      textAlign: "right",
                       color: isBanner ? theme.bannerInk : theme.ink,
                     }}
                   >
@@ -287,6 +302,7 @@ export default function InvoiceViewPage() {
                     style={{
                       border: `2px solid ${isBanner ? theme.bannerInk : theme.ink}`,
                       padding: "8px 16px",
+                      textAlign: "right",
                       color: isBanner ? theme.bannerInk : theme.ink,
                     }}
                   >
@@ -467,6 +483,62 @@ export default function InvoiceViewPage() {
                   <span>{currency} {total}</span>
                 </div>
               </div>
+
+              {docType === "packing-slip" && (
+                <div
+                  style={{
+                    display: "flex",
+                    border: "1px dashed #c4c6c8",
+                    marginBottom: "40px",
+                  }}
+                >
+                  <div
+                    style={{
+                      flex: 1,
+                      padding: "14px",
+                      textAlign: "center",
+                      fontWeight: 700,
+                      fontSize: "13px",
+                      borderRight: "1px dashed #c4c6c8",
+                    }}
+                  >
+                    PAID
+                  </div>
+                  <div
+                    style={{
+                      flex: 1,
+                      padding: "14px",
+                      textAlign: "center",
+                      fontSize: "15px",
+                      borderRight: "1px dashed #c4c6c8",
+                    }}
+                  >
+                    {currency} {paid}
+                  </div>
+                  <div
+                    style={{
+                      flex: 1,
+                      padding: "14px",
+                      textAlign: "center",
+                      fontWeight: 700,
+                      fontSize: "13px",
+                      borderRight: "1px dashed #c4c6c8",
+                    }}
+                  >
+                    AMOUNT DUE
+                  </div>
+                  <div
+                    style={{
+                      flex: 1,
+                      padding: "14px",
+                      textAlign: "center",
+                      fontSize: "15px",
+                    }}
+                  >
+                    {currency} {amountDue}
+                  </div>
+                </div>
+              )}
 
               <div style={{ textAlign: "center", marginTop: "40px" }}>
                 <Text as="p" variant="headingSm" fontWeight="bold">
