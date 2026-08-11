@@ -17,6 +17,9 @@ export interface TemplateSettings {
   footerMessage?: string;
   additionalFooterText?: string;
   logoUrl?: string;
+  logoWidth?: number;
+  logoHeight?: number;
+  headerFontSize?: number;
   displayOrderNo?: boolean;
   displayOrderDate?: boolean;
   templateStyle?: string;
@@ -31,6 +34,9 @@ const DEFAULT_SETTINGS: Required<TemplateSettings> = {
   footerMessage: "Thanks for your business...",
   additionalFooterText: "We truly appreciate your trust, and we'll do our best to continue to give you the service you deserve. We look forward to serving you again.",
   logoUrl: "",
+  logoWidth: 60,
+  logoHeight: 60,
+  headerFontSize: 13,
   displayOrderNo: true,
   displayOrderDate: true,
   templateStyle: "slim",
@@ -85,13 +91,10 @@ const styles = StyleSheet.create({
     minWidth: 100,
   },
   metaLabel: {
-    fontSize: 9,
-    fontFamily: "Helvetica-Bold",
+    fontWeight: 700,
     marginBottom: 2,
   },
-  metaValue: {
-    fontSize: 9,
-  },
+  metaValue: {},
   addressRow: {
     flexDirection: "row",
     marginBottom: 25,
@@ -163,8 +166,6 @@ const styles = StyleSheet.create({
     fontFamily: "Helvetica-Bold",
   },
   logo: {
-    width: 55,
-    height: 55,
     objectFit: "contain",
     marginRight: 12,
   },
@@ -300,7 +301,7 @@ export const InvoiceTemplate: React.FC<{
         } : {}
       ]}>
         <View style={styles.headerLeft}>
-          {s.logoUrl ? <Image style={styles.logo} src={s.logoUrl} /> : null}
+          {s.logoUrl ? <Image style={[styles.logo, { width: s.logoWidth, height: s.logoHeight }]} src={s.logoUrl} /> : null}
           <Text
             style={[
               styles.title,
@@ -314,14 +315,14 @@ export const InvoiceTemplate: React.FC<{
           <View style={styles.headerRight}>
             {s.displayOrderNo ? (
               <View style={[styles.metaBox, { borderColor: inkColor }]}>
-                <Text style={[styles.metaLabel, { color: inkColor }]}>ORDER NO</Text>
-                <Text style={[styles.metaValue, { color: inkColor }]}>{data.orderNumber}</Text>
+                <Text style={[styles.metaLabel, { color: inkColor, fontSize: s.headerFontSize }]}>ORDER NO</Text>
+                <Text style={[styles.metaValue, { color: inkColor, fontSize: s.headerFontSize }]}>{data.orderNumber}</Text>
               </View>
             ) : null}
             {s.displayOrderDate ? (
               <View style={[styles.metaBox, { borderColor: inkColor }]}>
-                <Text style={[styles.metaLabel, { color: inkColor }]}>ORDER DATE</Text>
-                <Text style={[styles.metaValue, { color: inkColor }]}>
+                <Text style={[styles.metaLabel, { color: inkColor, fontSize: s.headerFontSize }]}>ORDER DATE</Text>
+                <Text style={[styles.metaValue, { color: inkColor, fontSize: s.headerFontSize }]}>
                   {new Date(data.createdAt).toLocaleDateString()}
                 </Text>
               </View>
@@ -430,7 +431,7 @@ export const InvoiceTemplate: React.FC<{
         <View style={styles.footer}>
           <Text style={styles.footerTitle}>{s.footerMessage}</Text>
           <Text style={styles.footerText}>
-            {s.additionalFooterText}
+            {s.additionalFooterText.replace(/<br\s*\/?>/gi, '\n')}
           </Text>
         </View>
       ) : null}
@@ -462,7 +463,7 @@ export const PackingSlipTemplate: React.FC<{
         } : {}
       ]}>
         <View style={styles.headerLeft}>
-          {s.logoUrl ? <Image style={styles.logo} src={s.logoUrl} /> : null}
+          {s.logoUrl ? <Image style={[styles.logo, { width: s.logoWidth, height: s.logoHeight }]} src={s.logoUrl} /> : null}
           <Text
             style={[
               styles.title,
@@ -476,14 +477,14 @@ export const PackingSlipTemplate: React.FC<{
           <View style={styles.headerRight}>
             {s.displayOrderNo ? (
               <View style={[styles.metaBox, { borderColor: inkColor }]}>
-                <Text style={[styles.metaLabel, { color: inkColor }]}>ORDER NO</Text>
-                <Text style={[styles.metaValue, { color: inkColor }]}>{data.orderNumber}</Text>
+                <Text style={[styles.metaLabel, { color: inkColor, fontSize: s.headerFontSize }]}>ORDER NO</Text>
+                <Text style={[styles.metaValue, { color: inkColor, fontSize: s.headerFontSize }]}>{data.orderNumber}</Text>
               </View>
             ) : null}
             {s.displayOrderDate ? (
               <View style={[styles.metaBox, { borderColor: inkColor }]}>
-                <Text style={[styles.metaLabel, { color: inkColor }]}>ORDER DATE</Text>
-                <Text style={[styles.metaValue, { color: inkColor }]}>
+                <Text style={[styles.metaLabel, { color: inkColor, fontSize: s.headerFontSize }]}>ORDER DATE</Text>
+                <Text style={[styles.metaValue, { color: inkColor, fontSize: s.headerFontSize }]}>
                   {new Date(data.createdAt).toLocaleDateString()}
                 </Text>
               </View>
@@ -611,7 +612,7 @@ export const PackingSlipTemplate: React.FC<{
         <View style={styles.footer}>
           <Text style={styles.footerTitle}>{s.footerMessage}</Text>
           <Text style={styles.footerText}>
-            {s.additionalFooterText}
+            {s.additionalFooterText.replace(/<br\s*\/?>/gi, '\n')}
           </Text>
         </View>
       ) : null}

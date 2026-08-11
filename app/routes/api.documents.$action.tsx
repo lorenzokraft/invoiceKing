@@ -164,6 +164,9 @@ async function loadTemplateSettings(
       config.additionalFooterText ||
       "We truly appreciate your trust, and we'll do our best to continue to give you the service you deserve. We look forward to serving you again.",
     logoUrl: config.logoUrl || undefined,
+    logoWidth: config.logoWidth ? Number(config.logoWidth) : 60,
+    logoHeight: config.logoHeight ? Number(config.logoHeight) : 60,
+    headerFontSize: config.headerFontSize ? Number(config.headerFontSize) : 13,
     displayOrderNo: config.displayOrderNo ?? true,
     displayOrderDate: config.displayOrderDate ?? true,
     templateStyle: config.templateStyle || "slim",

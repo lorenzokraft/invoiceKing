@@ -16,6 +16,7 @@ import {
   Divider,
   Checkbox,
   Icon,
+  RangeSlider,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
@@ -82,9 +83,11 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return json({
     templateType: "invoice",
     logoUrl: finalSettings?.logoUrl || "",
+    headerFontSize: finalSettings?.headerFontSize || 13,
     titleFontType: finalSettings?.titleFontType || "Bitter",
-    titleFontSize: finalSettings?.titleFontSize || 14,
     titleColor: finalSettings?.titleColor || "#000000",
+    logoWidth: finalSettings?.logoWidth || 60,
+    logoHeight: finalSettings?.logoHeight || 60,
     labelFontType: finalSettings?.labelFontType || "Bitter",
     labelFontSize: finalSettings?.labelFontSize || 12,
     labelColor: finalSettings?.labelColor || "#6d6f80",
@@ -287,14 +290,8 @@ export default function TemplatesPage() {
                         <>
                           <img
                             src={formData.logoUrl}
-                            alt="Logo preview"
-                            style={{
-                              height: "36px",
-                              maxWidth: "100px",
-                              objectFit: "contain",
-                              border: "1px solid #e1e3e5",
-                              borderRadius: "4px",
-                            }}
+                            alt="Logo"
+                            style={{ width: `${formData.logoWidth}px`, height: `${formData.logoHeight}px`, objectFit: "contain" }}
                           />
                           <Button
                             variant="plain"
@@ -309,6 +306,28 @@ export default function TemplatesPage() {
                       )}
                     </div>
                   </div>
+                  {formData.logoUrl && (
+                    <>
+                      <RangeSlider
+                        label="Logo Width"
+                        value={formData.logoWidth}
+                        onChange={(value) => setFormData((prev) => ({ ...prev, logoWidth: value }))}
+                        min={20}
+                        max={200}
+                        output
+                        suffix={<p>{formData.logoWidth}px</p>}
+                      />
+                      <RangeSlider
+                        label="Logo Height"
+                        value={formData.logoHeight}
+                        onChange={(value) => setFormData((prev) => ({ ...prev, logoHeight: value }))}
+                        min={20}
+                        max={200}
+                        output
+                        suffix={<p>{formData.logoHeight}px</p>}
+                      />
+                    </>
+                  )}
                   <Select
                     label="Title Font Type"
                     options={[
@@ -320,12 +339,13 @@ export default function TemplatesPage() {
                     onChange={handleChange("titleFontType")}
                   />
                   <TextField
-                    label="Title Font Size"
+                    label="Header Font Size"
                     type="number"
-                    value={String(formData.titleFontSize)}
-                    onChange={handleChange("titleFontSize")}
+                    value={String(formData.headerFontSize)}
+                    onChange={handleChange("headerFontSize")}
                     suffix="px"
                     autoComplete="off"
+                    helpText="Controls ORDER NO and ORDER DATE box text size"
                   />
                   <div>
                     <Text as="p" variant="bodyMd">
@@ -653,13 +673,8 @@ export default function TemplatesPage() {
                     {formData.logoUrl ? (
                       <img
                         src={formData.logoUrl}
-                        alt="Company logo"
-                        style={{
-                          maxWidth: "120px",
-                          maxHeight: "60px",
-                          objectFit: "contain",
-                          ...(isBanner ? { filter: "brightness(0) invert(1)" } : {}),
-                        }}
+                        alt="Logo"
+                        style={{ width: `${formData.logoWidth}px`, height: `${formData.logoHeight}px`, objectFit: "contain" }}
                       />
                     ) : (
                       <div
@@ -699,13 +714,13 @@ export default function TemplatesPage() {
                         >
                           <div
                             style={{
-                              fontSize: "10px",
+                              fontSize: `${formData.headerFontSize}px`,
                               fontWeight: "bold",
                             }}
                           >
                             ORDER NO
                           </div>
-                          <div>INV-1024</div>
+                          <div style={{ fontSize: `${formData.headerFontSize}px` }}>INV-1024</div>
                         </div>
                       )}
                       {formData.displayOrderDate && (
@@ -718,13 +733,13 @@ export default function TemplatesPage() {
                         >
                           <div
                             style={{
-                              fontSize: "10px",
+                              fontSize: `${formData.headerFontSize}px`,
                               fontWeight: "bold",
                             }}
                           >
                             ORDER DATE
                           </div>
-                          <div>26 July, 2026</div>
+                          <div style={{ fontSize: `${formData.headerFontSize}px` }}>26 July, 2026</div>
                         </div>
                       )}
                     </div>

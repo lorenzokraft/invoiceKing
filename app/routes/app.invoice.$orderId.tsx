@@ -138,6 +138,9 @@ export default function InvoiceViewPage() {
     templateConfig?.additionalFooterText ||
     "We truly appreciate your trust, and we'll do our best to continue to give you the service you deserve. We look forward to serving you again.";
   const logoUrl = templateConfig?.logoUrl || "";
+  const logoWidth = templateConfig?.logoWidth || 60;
+  const logoHeight = templateConfig?.logoHeight || 60;
+  const headerFontSize = templateConfig?.headerFontSize || 13;
   const displayOrderNo = templateConfig?.displayOrderNo ?? true;
   const displayOrderDate = templateConfig?.displayOrderDate ?? true;
 
@@ -270,14 +273,8 @@ export default function InvoiceViewPage() {
                   {logoUrl && (
                     <img
                       src={logoUrl}
-                      alt="Store logo"
-                      style={{
-                        maxWidth: "80px",
-                        maxHeight: "80px",
-                        objectFit: "contain",
-                        display: "block",
-                        ...(isBanner ? { filter: "brightness(0) invert(1)" } : {}),
-                      }}
+                      alt="Logo"
+                      style={{ width: `${logoWidth}px`, height: `${logoHeight}px`, objectFit: "contain" }}
                     />
                   )}
                   <span
@@ -301,8 +298,8 @@ export default function InvoiceViewPage() {
                         color: isBanner ? theme.bannerInk : theme.ink,
                       }}
                     >
-                      <div style={{ fontWeight: 700, fontSize: "13px" }}>ORDER NO</div>
-                      <div style={{ fontSize: "13px" }}>{order.name}</div>
+                      <div style={{ fontWeight: 700, fontSize: `${headerFontSize}px` }}>ORDER NO</div>
+                      <div style={{ fontSize: `${headerFontSize}px` }}>{order.name}</div>
                     </div>
                   )}
                   {displayOrderDate && (
@@ -314,8 +311,8 @@ export default function InvoiceViewPage() {
                         color: isBanner ? theme.bannerInk : theme.ink,
                       }}
                     >
-                      <div style={{ fontWeight: 700, fontSize: "13px" }}>ORDER DATE</div>
-                      <div style={{ fontSize: "13px" }}>
+                      <div style={{ fontWeight: 700, fontSize: `${headerFontSize}px` }}>ORDER DATE</div>
+                      <div style={{ fontSize: `${headerFontSize}px` }}>
                         {new Date(order.createdAt).toLocaleDateString()}
                       </div>
                     </div>
@@ -553,9 +550,10 @@ export default function InvoiceViewPage() {
                 <Text as="p" variant="headingSm" fontWeight="bold">
                   {footerMessage}
                 </Text>
-                <Text as="p" variant="bodyMd" tone="subdued">
-                  {additionalFooterText}
-                </Text>
+                <div
+                  style={{ color: "#6d7175", fontSize: "14px" }}
+                  dangerouslySetInnerHTML={{ __html: additionalFooterText }}
+                />
               </div>
             </div>
           </div>
