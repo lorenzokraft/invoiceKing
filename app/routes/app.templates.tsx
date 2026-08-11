@@ -424,6 +424,7 @@ export default function TemplatesPage() {
                     onChange={handleChange("documentTitleFontSize")}
                     suffix="px"
                     autoComplete="off"
+                    helpText="Controls the INVOICE / PACKING SLIP title size"
                   />
                   <Select
                     label="Product Variant"
@@ -1008,11 +1009,10 @@ export default function TemplatesPage() {
                         {formData.footerMessage}
                       </p>
                     )}
-                    <p style={{ color: "#666", marginTop: "8px" }}>
-                      We truly appreciate your trust, and we'll do our best to
-                      continue to give you the service you deserve. We look
-                      forward to serving you again.
-                    </p>
+                    <div
+                      style={{ color: "#666", marginTop: "8px" }}
+                      dangerouslySetInnerHTML={{ __html: formData.additionalFooterText || "We truly appreciate your trust, and we'll do our best to continue to give you the service you deserve. We look forward to serving you again." }}
+                    />
                     {(formData.facebookUrl || formData.instagramUrl || formData.xUrl) && (
                       <div style={{ marginTop: "16px", display: "flex", gap: "12px", justifyContent: "center" }}>
                         {formData.facebookUrl && (
