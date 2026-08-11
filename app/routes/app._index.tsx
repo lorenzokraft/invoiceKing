@@ -289,7 +289,7 @@ export default function Index() {
   return (
     <Page fullWidth>
       <TitleBar title="Dashboard" />
-      <div style={{ padding: "0 24px" }}>
+      <div style={{ padding: "0 48px" }}>
         <BlockStack gap="500">
         {isFree && (
           <Banner tone="info">
@@ -414,7 +414,7 @@ export default function Index() {
                 </BlockStack>
               </Card>
               <Card>
-                <BlockStack gap="300">
+                <BlockStack gap="500">
                   <Text as="h3" variant="headingSm" tone="subdued">
                     Current Period Resets
                   </Text>
