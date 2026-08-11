@@ -160,6 +160,9 @@ async function loadTemplateSettings(
       ? Number(config.labelFontSize)
       : undefined,
     footerMessage: config.footerMessage,
+    additionalFooterText:
+      config.additionalFooterText ||
+      "We truly appreciate your trust, and we'll do our best to continue to give you the service you deserve. We look forward to serving you again.",
     logoUrl: config.logoUrl || undefined,
     displayOrderNo: config.displayOrderNo ?? true,
     displayOrderDate: config.displayOrderDate ?? true,

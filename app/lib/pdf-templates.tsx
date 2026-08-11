@@ -15,6 +15,7 @@ export interface TemplateSettings {
   labelColor?: string;
   labelFontSize?: number;
   footerMessage?: string;
+  additionalFooterText?: string;
   logoUrl?: string;
   displayOrderNo?: boolean;
   displayOrderDate?: boolean;
@@ -28,6 +29,7 @@ const DEFAULT_SETTINGS: Required<TemplateSettings> = {
   labelColor: "#6d6f80",
   labelFontSize: 10,
   footerMessage: "Thanks for your business...",
+  additionalFooterText: "We truly appreciate your trust, and we'll do our best to continue to give you the service you deserve. We look forward to serving you again.",
   logoUrl: "",
   displayOrderNo: true,
   displayOrderDate: true,
@@ -308,22 +310,24 @@ export const InvoiceTemplate: React.FC<{
             {s.documentTitle}
           </Text>
         </View>
-        <View style={styles.headerRight}>
-          {s.displayOrderNo ? (
-            <View style={[styles.metaBox, { borderColor: inkColor }]}>
-              <Text style={[styles.metaLabel, { color: inkColor }]}>ORDER NO</Text>
-              <Text style={[styles.metaValue, { color: inkColor }]}>{data.orderNumber}</Text>
-            </View>
-          ) : null}
-          {s.displayOrderDate ? (
-            <View style={[styles.metaBox, { borderColor: inkColor }]}>
-              <Text style={[styles.metaLabel, { color: inkColor }]}>ORDER DATE</Text>
-              <Text style={[styles.metaValue, { color: inkColor }]}>
-                {new Date(data.createdAt).toLocaleDateString()}
-              </Text>
-            </View>
-          ) : null}
-        </View>
+        {(s.displayOrderNo || s.displayOrderDate) && (
+          <View style={styles.headerRight}>
+            {s.displayOrderNo ? (
+              <View style={[styles.metaBox, { borderColor: inkColor }]}>
+                <Text style={[styles.metaLabel, { color: inkColor }]}>ORDER NO</Text>
+                <Text style={[styles.metaValue, { color: inkColor }]}>{data.orderNumber}</Text>
+              </View>
+            ) : null}
+            {s.displayOrderDate ? (
+              <View style={[styles.metaBox, { borderColor: inkColor }]}>
+                <Text style={[styles.metaLabel, { color: inkColor }]}>ORDER DATE</Text>
+                <Text style={[styles.metaValue, { color: inkColor }]}>
+                  {new Date(data.createdAt).toLocaleDateString()}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+        )}
       </View>
 
       <View style={styles.addressRow}>
@@ -338,7 +342,7 @@ export const InvoiceTemplate: React.FC<{
           address={data.customer.billingAddress || data.customer.shippingAddress}
         />
         <AddressBlock
-          label="CUSTOMER ADDRESS"
+          label="CUSTOMER DETAILS"
           name={data.customer.name}
           email={data.customer.email}
         />
@@ -426,9 +430,7 @@ export const InvoiceTemplate: React.FC<{
         <View style={styles.footer}>
           <Text style={styles.footerTitle}>{s.footerMessage}</Text>
           <Text style={styles.footerText}>
-            We truly appreciate your trust, and we'll do our best to continue to
-            give you the service you deserve. We look forward to serving you
-            again.
+            {s.additionalFooterText}
           </Text>
         </View>
       ) : null}
@@ -470,22 +472,24 @@ export const PackingSlipTemplate: React.FC<{
             {s.documentTitle}
           </Text>
         </View>
-        <View style={styles.headerRight}>
-          {s.displayOrderNo ? (
-            <View style={[styles.metaBox, { borderColor: inkColor }]}>
-              <Text style={[styles.metaLabel, { color: inkColor }]}>ORDER NO</Text>
-              <Text style={[styles.metaValue, { color: inkColor }]}>{data.orderNumber}</Text>
-            </View>
-          ) : null}
-          {s.displayOrderDate ? (
-            <View style={[styles.metaBox, { borderColor: inkColor }]}>
-              <Text style={[styles.metaLabel, { color: inkColor }]}>ORDER DATE</Text>
-              <Text style={[styles.metaValue, { color: inkColor }]}>
-                {new Date(data.createdAt).toLocaleDateString()}
-              </Text>
-            </View>
-          ) : null}
-        </View>
+        {(s.displayOrderNo || s.displayOrderDate) && (
+          <View style={styles.headerRight}>
+            {s.displayOrderNo ? (
+              <View style={[styles.metaBox, { borderColor: inkColor }]}>
+                <Text style={[styles.metaLabel, { color: inkColor }]}>ORDER NO</Text>
+                <Text style={[styles.metaValue, { color: inkColor }]}>{data.orderNumber}</Text>
+              </View>
+            ) : null}
+            {s.displayOrderDate ? (
+              <View style={[styles.metaBox, { borderColor: inkColor }]}>
+                <Text style={[styles.metaLabel, { color: inkColor }]}>ORDER DATE</Text>
+                <Text style={[styles.metaValue, { color: inkColor }]}>
+                  {new Date(data.createdAt).toLocaleDateString()}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+        )}
       </View>
 
       <View style={styles.addressRow}>
@@ -500,7 +504,7 @@ export const PackingSlipTemplate: React.FC<{
           address={data.customer.billingAddress || data.customer.shippingAddress}
         />
         <AddressBlock
-          label="CUSTOMER ADDRESS"
+          label="CUSTOMER DETAILS"
           name={data.customer.name}
           email={data.customer.email}
         />
@@ -607,9 +611,7 @@ export const PackingSlipTemplate: React.FC<{
         <View style={styles.footer}>
           <Text style={styles.footerTitle}>{s.footerMessage}</Text>
           <Text style={styles.footerText}>
-            We truly appreciate your trust, and we'll do our best to continue to
-            give you the service you deserve. We look forward to serving you
-            again.
+            {s.additionalFooterText}
           </Text>
         </View>
       ) : null}

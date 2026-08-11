@@ -134,7 +134,12 @@ export default function InvoiceViewPage() {
   const titleColor = templateConfig?.titleColor || theme.ink;
   const footerMessage =
     templateConfig?.footerMessage || "Thanks for your business...";
+  const additionalFooterText =
+    templateConfig?.additionalFooterText ||
+    "We truly appreciate your trust, and we'll do our best to continue to give you the service you deserve. We look forward to serving you again.";
   const logoUrl = templateConfig?.logoUrl || "";
+  const displayOrderNo = templateConfig?.displayOrderNo ?? true;
+  const displayOrderDate = templateConfig?.displayOrderDate ?? true;
 
   useEffect(() => {
     if (searchParams.get("print") === "true") {
@@ -287,30 +292,34 @@ export default function InvoiceViewPage() {
                   </span>
                 </div>
                 <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                  <div
-                    style={{
-                      border: `2px solid ${isBanner ? theme.bannerInk : theme.ink}`,
-                      padding: "8px 16px",
-                      textAlign: "right",
-                      color: isBanner ? theme.bannerInk : theme.ink,
-                    }}
-                  >
-                    <div style={{ fontWeight: 700, fontSize: "13px" }}>ORDER NO</div>
-                    <div style={{ fontSize: "13px" }}>{order.name}</div>
-                  </div>
-                  <div
-                    style={{
-                      border: `2px solid ${isBanner ? theme.bannerInk : theme.ink}`,
-                      padding: "8px 16px",
-                      textAlign: "right",
-                      color: isBanner ? theme.bannerInk : theme.ink,
-                    }}
-                  >
-                    <div style={{ fontWeight: 700, fontSize: "13px" }}>ORDER DATE</div>
-                    <div style={{ fontSize: "13px" }}>
-                      {new Date(order.createdAt).toLocaleDateString()}
+                  {displayOrderNo && (
+                    <div
+                      style={{
+                        border: `2px solid ${isBanner ? theme.bannerInk : theme.ink}`,
+                        padding: "8px 16px",
+                        textAlign: "right",
+                        color: isBanner ? theme.bannerInk : theme.ink,
+                      }}
+                    >
+                      <div style={{ fontWeight: 700, fontSize: "13px" }}>ORDER NO</div>
+                      <div style={{ fontSize: "13px" }}>{order.name}</div>
                     </div>
-                  </div>
+                  )}
+                  {displayOrderDate && (
+                    <div
+                      style={{
+                        border: `2px solid ${isBanner ? theme.bannerInk : theme.ink}`,
+                        padding: "8px 16px",
+                        textAlign: "right",
+                        color: isBanner ? theme.bannerInk : theme.ink,
+                      }}
+                    >
+                      <div style={{ fontWeight: 700, fontSize: "13px" }}>ORDER DATE</div>
+                      <div style={{ fontSize: "13px" }}>
+                        {new Date(order.createdAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -380,7 +389,7 @@ export default function InvoiceViewPage() {
 
                 <div>
                   <Text as="p" variant="headingSm" fontWeight="bold">
-                    CUSTOMER ADDRESS
+                    CUSTOMER DETAILS
                   </Text>
                   <Text as="p" variant="bodyMd">
                     {order.customer?.displayName || "Guest"}
@@ -545,8 +554,7 @@ export default function InvoiceViewPage() {
                   {footerMessage}
                 </Text>
                 <Text as="p" variant="bodyMd" tone="subdued">
-                  We truly appreciate your trust, and we'll do our best to continue to give you
-                  the service you deserve. We look forward to serving you again.
+                  {additionalFooterText}
                 </Text>
               </div>
             </div>

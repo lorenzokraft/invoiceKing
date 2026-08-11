@@ -102,6 +102,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     displayInvoiceNo: finalSettings?.displayInvoiceNo ?? true,
     displayOrderDate: finalSettings?.displayOrderDate ?? true,
     footerMessage: finalSettings?.footerMessage || "Thanks for your business...",
+    additionalFooterText: finalSettings?.additionalFooterText || "We truly appreciate your trust, and we'll do our best to continue to give you the service you deserve. We look forward to serving you again.",
     language: finalSettings?.language || "en",
     templateStyle: styleParam || finalSettings?.templateStyle || "slim",
   });
@@ -548,46 +549,17 @@ export default function TemplatesPage() {
                     multiline={3}
                     autoComplete="off"
                   />
+                  <TextField
+                    label="Additional Footer Text"
+                    value={formData.additionalFooterText}
+                    onChange={handleChange("additionalFooterText")}
+                    multiline={3}
+                    autoComplete="off"
+                  />
                 </BlockStack>
               </Collapsible>
 
               <Divider />
-
-              <div
-                onClick={() => setNumberingOpen(!numberingOpen)}
-                style={{ cursor: "pointer", padding: "12px 0", borderBottom: "1px solid #e1e3e5" }}
-              >
-                <InlineStack align="space-between" blockAlign="center">
-                  <InlineStack gap="300" blockAlign="center">
-                    <Icon source={ListNumberedIcon} tone="base" />
-                    <Text as="p" variant="bodyMd" fontWeight="medium">
-                      Invoice Numbering
-                    </Text>
-                  </InlineStack>
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <Icon source={numberingOpen ? ChevronUpIcon : ChevronDownIcon} tone="subdued" />
-                  </div>
-                </InlineStack>
-              </div>
-
-              <Divider />
-
-              <div
-                onClick={() => setBarcodesOpen(!barcodesOpen)}
-                style={{ cursor: "pointer", padding: "12px 0", borderBottom: "1px solid #e1e3e5" }}
-              >
-                <InlineStack align="space-between" blockAlign="center">
-                  <InlineStack gap="300" blockAlign="center">
-                    <Icon source={BarcodeIcon} tone="base" />
-                    <Text as="p" variant="bodyMd" fontWeight="medium">
-                      Barcodes & QR Codes
-                    </Text>
-                  </InlineStack>
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <Icon source={barcodesOpen ? ChevronUpIcon : ChevronDownIcon} tone="subdued" />
-                  </div>
-                </InlineStack>
-              </div>
 
               <Button variant="primary" onClick={handleSave} fullWidth>
                 Save Template
@@ -601,9 +573,6 @@ export default function TemplatesPage() {
             <BlockStack gap="400">
               <InlineStack align="space-between" blockAlign="center">
                 <InlineStack gap="200">
-                  <Button icon={PrintIcon} onClick={handlePrint}>Print</Button>
-                  <Button icon={ImportIcon} onClick={handleDownload}>Download</Button>
-                  <Button icon={EmailIcon} onClick={handleSend}>Send</Button>
                   <Button url="/app/templates/gallery" variant="secondary">Change Template</Button>
                 </InlineStack>
                 <InlineStack gap="200" blockAlign="center">
@@ -720,40 +689,44 @@ export default function TemplatesPage() {
                       {formData.documentTitle || "INVOICE"}
                     </h1>
                     <div style={{ display: "flex", gap: "10px" }}>
-                      <div
-                        style={{
-                          border: `2px solid ${isBanner ? theme.bannerInk : theme.ink}`,
-                          padding: "8px 12px",
-                          color: isBanner ? theme.bannerInk : theme.ink,
-                        }}
-                      >
+                      {formData.displayOrderNo && (
                         <div
                           style={{
-                            fontSize: "10px",
-                            fontWeight: "bold",
+                            border: `2px solid ${isBanner ? theme.bannerInk : theme.ink}`,
+                            padding: "8px 12px",
+                            color: isBanner ? theme.bannerInk : theme.ink,
                           }}
                         >
-                          ORDER NO
+                          <div
+                            style={{
+                              fontSize: "10px",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            ORDER NO
+                          </div>
+                          <div>INV-1024</div>
                         </div>
-                        <div>INV-1024</div>
-                      </div>
-                      <div
-                        style={{
-                          border: `2px solid ${isBanner ? theme.bannerInk : theme.ink}`,
-                          padding: "8px 12px",
-                          color: isBanner ? theme.bannerInk : theme.ink,
-                        }}
-                      >
+                      )}
+                      {formData.displayOrderDate && (
                         <div
                           style={{
-                            fontSize: "10px",
-                            fontWeight: "bold",
+                            border: `2px solid ${isBanner ? theme.bannerInk : theme.ink}`,
+                            padding: "8px 12px",
+                            color: isBanner ? theme.bannerInk : theme.ink,
                           }}
                         >
-                          ORDER DATE
+                          <div
+                            style={{
+                              fontSize: "10px",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            ORDER DATE
+                          </div>
+                          <div>26 July, 2026</div>
                         </div>
-                        <div>26 July, 2026</div>
-                      </div>
+                      )}
                     </div>
                   </div>
 
@@ -812,7 +785,7 @@ export default function TemplatesPage() {
                             marginBottom: "8px",
                           }}
                         >
-                          CUSTOMER ADDRESS
+                          CUSTOMER DETAILS
                         </div>
                         <div>Benjamin Biermann</div>
                         <div>Leo Hoover GmbH</div>
