@@ -287,10 +287,9 @@ export default function Index() {
   ];
 
   return (
-    <Page fullWidth>
+    <Page>
       <TitleBar title="Dashboard" />
-      <div style={{ padding: "0 48px" }}>
-        <BlockStack gap="500">
+      <BlockStack gap="500">
         {isFree && (
           <Banner tone="info">
             You've used {invoicesThisMonth} of {FREE_PLAN_MONTHLY_LIMIT} free
@@ -427,7 +426,6 @@ export default function Index() {
           </Layout.Section>
         </Layout>
       </BlockStack>
-      </div>
     </Page>
   );
 }
