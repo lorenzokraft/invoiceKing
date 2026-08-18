@@ -176,6 +176,13 @@ export default function OrdersPage() {
                       navigate(`/app/invoice/${encodeURIComponent(node.id)}?print=true&type=packing-slip`);
                     },
                   },
+                  {
+                    content: 'Print Receipt',
+                    onAction: () => {
+                      togglePopover(node.id, 'print');
+                      navigate(`/app/invoice/${encodeURIComponent(node.id)}?print=true&type=receipt`);
+                    },
+                  },
                 ]}
               />
             </Popover>
@@ -236,6 +243,28 @@ export default function OrdersPage() {
                         setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
                       } catch (err) {
                         shopify.toast.show('Failed to download packing slip');
+                      }
+                    },
+                  },
+                  {
+                    content: 'Download Receipt',
+                    onAction: async () => {
+                      togglePopover(node.id, 'download');
+                      try {
+                        const url = `/api/documents/download?type=receipt&orderId=${encodeURIComponent(node.id)}&shop=${encodeURIComponent(shop)}`;
+                        const response = await fetch(url);
+                        if (!response.ok) throw new Error('Download failed');
+                        const blob = await response.blob();
+                        const blobUrl = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = blobUrl;
+                        link.download = `receipt-${node.name}.pdf`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+                      } catch (err) {
+                        shopify.toast.show('Failed to download receipt');
                       }
                     },
                   },

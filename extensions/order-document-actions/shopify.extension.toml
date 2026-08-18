@@ -40,10 +40,20 @@ url = "/app/document-action?mode=download&type=packing-slip"
 
 [[extensions]]
 type = "admin_link"
-name = "Send Invoice"
-handle = "send-invoice"
+name = "Print Receipt"
+handle = "print-receipt"
 uid = "8ef111cd-9788-f3cd-9e9c-fcc17b0539f5b9629525"
 
 [[extensions.targeting]]
 target = "admin.order-details.action.link"
-url = "/api/documents/send?type=invoice"
+url = "/app/document-action?mode=print&type=receipt"
+
+[[extensions]]
+type = "admin_link"
+name = "Download Receipt"
+handle = "download-receipt"
+uid = "a1b2c3d4-5678-90ab-cdef-1234567890ab"
+
+[[extensions.targeting]]
+target = "admin.order-details.action.link"
+url = "/app/document-action?mode=download&type=receipt"

@@ -252,7 +252,7 @@ async function loadTemplateSettings(
 
   const config = (template?.config as any) || {};
 
-  const defaultTitle = type === "invoice" ? "INVOICE" : "PACKING SLIP";
+  const defaultTitle = type === "invoice" ? "INVOICE" : type === "receipt" ? "RECEIPT" : "PACKING SLIP";
   const documentTitle =
     type === "invoice"
       ? config.documentTitle || defaultTitle

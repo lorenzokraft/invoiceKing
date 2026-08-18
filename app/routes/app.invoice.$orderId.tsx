@@ -244,6 +244,8 @@ export default function InvoiceViewPage() {
   const documentTitle =
     docType === "packing-slip"
       ? "PACKING SLIP"
+      : docType === "receipt"
+      ? "RECEIPT"
       : templateConfig?.documentTitle || "INVOICE";
   const theme = getTemplateTheme(templateConfig?.templateStyle);
   const isBanner = theme.layout === "banner" || theme.layout === "centered";

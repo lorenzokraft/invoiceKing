@@ -110,9 +110,6 @@ export default function SettingsPage() {
 
   const tabs = [
     { id: "store", content: "Store Settings" },
-    { id: "mail", content: "Mail Settings" },
-    { id: "upload", content: "Upload Settings" },
-    { id: "links", content: "Shopify Email Links" },
   ];
 
   return (
@@ -242,7 +239,7 @@ export default function SettingsPage() {
                       Multi Language
                     </Text>
                     <Text as="p" variant="bodyMd" tone="subdued">
-                      Invoice Wizard allows you to craft and dispatch documents in
+                      Invoice King allows you to craft and dispatch documents in
                       various languages. Please specify the languages in which you
                       wish to generate documents.
                     </Text>
@@ -267,7 +264,7 @@ export default function SettingsPage() {
                       Multi Currency
                     </Text>
                     <Text as="p" variant="bodyMd" tone="subdued">
-                      Invoice Wizard allows you to craft and dispatch documents in
+                      Invoice King allows you to craft and dispatch documents in
                       different currencies. Please specify the currency combination in
                       which you wish to generate documents.
                     </Text>
@@ -278,44 +275,13 @@ export default function SettingsPage() {
                         onChange={(value) =>
                           handleChange("useCustomerCurrency")(!value)
                         }
-                        helpText="Invoice Wizard will generate your documents in the currency of your store. Store currency can be changed from your Shopify store settings."
+                        helpText="Invoice King will generate your documents in the currency of your store. Store currency can be changed from your Shopify store settings."
                       />
                       <Checkbox
                         label="Customer's Currency"
                         checked={formData.useCustomerCurrency}
                         onChange={handleChange("useCustomerCurrency")}
-                        helpText="If you are using Shopify's currency conversion method in your store, Invoice Wizard can generate documents in different currencies."
-                      />
-                    </BlockStack>
-                  </BlockStack>
-                </Card>
-              </Layout.Section>
-
-              <Layout.Section>
-                <Card>
-                  <BlockStack gap="400">
-                    <Text as="h2" variant="headingMd">
-                      Credit Note Conditions
-                    </Text>
-                    <Text as="p" variant="bodyMd" tone="subdued">
-                      In this section, you can change the settings for when and how
-                      credit notes are automatically created.
-                    </Text>
-                    <BlockStack gap="300">
-                      <Checkbox
-                        label="Create a credit note when you cancel an order."
-                        checked={formData.creditNoteOnCancel}
-                        onChange={handleChange("creditNoteOnCancel")}
-                      />
-                      <Checkbox
-                        label="Create a credit note when you fully refund an order."
-                        checked={formData.creditNoteOnFullRefund}
-                        onChange={handleChange("creditNoteOnFullRefund")}
-                      />
-                      <Checkbox
-                        label="Create a credit note when you partially refund an order."
-                        checked={formData.creditNoteOnPartialRefund}
-                        onChange={handleChange("creditNoteOnPartialRefund")}
+                        helpText="If you are using Shopify's currency conversion method in your store, Invoice King can generate documents in different currencies."
                       />
                     </BlockStack>
                   </BlockStack>
