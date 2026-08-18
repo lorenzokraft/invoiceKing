@@ -10,6 +10,76 @@ import db from "../db.server";
 import { logAction } from "../lib/action-log.server";
 import { getTemplateTheme } from "../lib/template-themes";
 
+const DRAFT_ORDER_QUERY = `#graphql
+  query GetDraftOrder($id: ID!) {
+    draftOrder(id: $id) {
+      id
+      name
+      createdAt
+      totalPriceSet {
+        shopMoney {
+          amount
+          currencyCode
+        }
+      }
+      subtotalPriceSet {
+        shopMoney {
+          amount
+        }
+      }
+      totalTaxSet {
+        shopMoney {
+          amount
+        }
+      }
+      totalShippingPriceSet {
+        shopMoney {
+          amount
+        }
+      }
+      customer {
+        displayName
+        email
+      }
+      shippingAddress {
+        address1
+        address2
+        city
+        province
+        country
+        zip
+      }
+      billingAddress {
+        address1
+        address2
+        city
+        province
+        country
+        zip
+      }
+      lineItems(first: 100) {
+        edges {
+          node {
+            title
+            quantity
+            sku
+            originalUnitPriceSet {
+              shopMoney {
+                amount
+              }
+            }
+            originalTotalSet {
+              shopMoney {
+                amount
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 const ORDER_QUERY = `#graphql
   query GetOrder($id: ID!) {
     order(id: $id) {
@@ -99,15 +169,24 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     throw new Response("Order ID required", { status: 400 });
   }
 
-  const response = await admin.graphql(ORDER_QUERY, {
+  const isDraftOrder = orderId.includes('DraftOrder');
+  const query = isDraftOrder ? DRAFT_ORDER_QUERY : ORDER_QUERY;
+  
+  const response = await admin.graphql(query, {
     variables: { id: orderId },
   });
 
   const data = await response.json();
-  const order = data.data?.order;
+  const order = isDraftOrder ? data.data?.draftOrder : data.data?.order;
 
   if (!order) {
-    throw new Response("Order not found", { status: 404 });
+    throw new Response(isDraftOrder ? "Draft order not found" : "Order not found", { status: 404 });
+  }
+
+  // For draft orders, add missing fields with default values
+  if (isDraftOrder) {
+    order.totalReceivedSet = { shopMoney: { amount: "0" } };
+    order.totalOutstandingSet = { shopMoney: { amount: order.totalPriceSet?.shopMoney?.amount || "0" } };
   }
 
   const template = await db.template.findFirst({

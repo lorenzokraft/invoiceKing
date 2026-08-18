@@ -9,6 +9,76 @@ import { logAction } from "../lib/action-log.server";
 
 const FREE_PLAN_MONTHLY_LIMIT = 50;
 
+const DRAFT_ORDER_QUERY = `#graphql
+  query GetDraftOrder($id: ID!) {
+    draftOrder(id: $id) {
+      id
+      name
+      createdAt
+      totalPriceSet {
+        shopMoney {
+          amount
+          currencyCode
+        }
+      }
+      subtotalPriceSet {
+        shopMoney {
+          amount
+        }
+      }
+      totalTaxSet {
+        shopMoney {
+          amount
+        }
+      }
+      totalShippingPriceSet {
+        shopMoney {
+          amount
+        }
+      }
+      customer {
+        displayName
+        email
+      }
+      shippingAddress {
+        address1
+        address2
+        city
+        province
+        zip
+        country
+      }
+      billingAddress {
+        address1
+        address2
+        city
+        province
+        zip
+        country
+      }
+      lineItems(first: 100) {
+        edges {
+          node {
+            title
+            quantity
+            sku
+            originalUnitPriceSet {
+              shopMoney {
+                amount
+              }
+            }
+            originalTotalSet {
+              shopMoney {
+                amount
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 const ORDER_QUERY = `#graphql
   query GetOrder($id: ID!) {
     order(id: $id) {
@@ -90,15 +160,24 @@ const ORDER_QUERY = `#graphql
 `;
 
 async function fetchOrderData(admin: any, orderId: string) {
-  const response = await admin.graphql(ORDER_QUERY, {
+  const isDraftOrder = orderId.includes('DraftOrder');
+  const query = isDraftOrder ? DRAFT_ORDER_QUERY : ORDER_QUERY;
+  
+  const response = await admin.graphql(query, {
     variables: { id: orderId },
   });
 
   const data = await response.json();
-  const order = data.data?.order;
+  const order = isDraftOrder ? data.data?.draftOrder : data.data?.order;
 
   if (!order) {
-    throw new Error("Order not found");
+    throw new Error(isDraftOrder ? "Draft order not found" : "Order not found");
+  }
+
+  // For draft orders, add missing fields with default values
+  if (isDraftOrder) {
+    order.totalReceivedSet = { shopMoney: { amount: "0" } };
+    order.totalOutstandingSet = { shopMoney: { amount: order.totalPriceSet?.shopMoney?.amount || "0" } };
   }
 
   return {
