@@ -1,6 +1,7 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData, useSearchParams, Link } from "@remix-run/react";
+import { useLoaderData, useSearchParams, useNavigate, Link } from "@remix-run/react";
+import { useState } from "react";
 import {
   Page,
   Card,
@@ -66,11 +67,10 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
 };
 
-import { useState } from "react";
-
 export default function OrdersPage() {
   const { orders, pageInfo, error, shop } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const searchQuery = searchParams.get("q") || "";
   const [activePopovers, setActivePopovers] = useState<Record<string, boolean>>({});
 
@@ -165,15 +165,15 @@ export default function OrdersPage() {
                   {
                     content: 'Print Invoice',
                     onAction: () => {
-                      window.location.href = `/app/invoice/${encodeURIComponent(node.id)}?print=true&type=invoice`;
                       togglePopover(node.id, 'print');
+                      navigate(`/app/invoice/${encodeURIComponent(node.id)}?print=true&type=invoice`);
                     },
                   },
                   {
                     content: 'Print Packing Slip',
                     onAction: () => {
-                      window.location.href = `/app/invoice/${encodeURIComponent(node.id)}?print=true&type=packing-slip`;
                       togglePopover(node.id, 'print');
+                      navigate(`/app/invoice/${encodeURIComponent(node.id)}?print=true&type=packing-slip`);
                     },
                   },
                 ]}
