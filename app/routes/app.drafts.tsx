@@ -1,6 +1,7 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData, useSearchParams } from "@remix-run/react";
+import { useLoaderData, useSearchParams, useNavigate } from "@remix-run/react";
+import { useState } from "react";
 import {
   Page,
   Card,
@@ -13,6 +14,8 @@ import {
   TextField,
   Pagination,
   Banner,
+  Popover,
+  ActionList,
 } from "@shopify/polaris";
 import {
   PrintIcon,
@@ -24,7 +27,7 @@ import { authenticate } from "../shopify.server";
 import { DRAFT_ORDERS_QUERY } from "../graphql/draft-orders.query";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { admin } = await authenticate.admin(request);
+  const { admin, session } = await authenticate.admin(request);
   const url = new URL(request.url);
   const cursor = url.searchParams.get("cursor");
   const searchQuery = url.searchParams.get("q") || "";
@@ -45,7 +48,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       hasPreviousPage: false,
     };
 
-    return json({ drafts, pageInfo, searchQuery, error: null });
+    return json({ drafts, pageInfo, searchQuery, error: null, shop: session.shop });
   } catch (error: any) {
     const message: string = error?.message || "Failed to load draft orders";
     console.error("Drafts loader error:", message);
@@ -54,6 +57,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       drafts: [],
       pageInfo: { hasNextPage: false, hasPreviousPage: false },
       searchQuery,
+      shop: session.shop,
       error: message.includes("not approved to access")
         ? "This app needs Protected Customer Data access approval to read draft orders. Enable it in the Shopify dev dashboard under API access."
         : message,
@@ -75,9 +79,16 @@ const statusTone = (status: string) => {
 };
 
 export default function DraftsPage() {
-  const { drafts, pageInfo, error } = useLoaderData<typeof loader>();
+  const { drafts, pageInfo, error, shop } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const searchQuery = searchParams.get("q") || "";
+  const [activePopovers, setActivePopovers] = useState<Record<string, boolean>>({});
+
+  const togglePopover = (draftId: string, type: 'print' | 'download') => {
+    const key = `${draftId}-${type}`;
+    setActivePopovers(prev => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const resourceName = {
     singular: "draft order",
@@ -119,31 +130,107 @@ export default function DraftsPage() {
       </IndexTable.Cell>
       <IndexTable.Cell>
         <ButtonGroup>
-          <Button
-            size="slim"
-            icon={PrintIcon}
-            onClick={() => {
-              const url = `/api/documents/print?type=invoice&orderId=${encodeURIComponent(node.id)}`;
-              window.open(url, "_blank");
-            }}
+          <Popover
+            active={activePopovers[`${node.id}-print`] || false}
+            activator={
+              <Button
+                size="slim"
+                icon={PrintIcon}
+                onClick={() => togglePopover(node.id, 'print')}
+                disclosure
+              >
+                Print
+              </Button>
+            }
+            onClose={() => togglePopover(node.id, 'print')}
           >
-            Print
-          </Button>
-          <Button
-            size="slim"
-            icon={ImportIcon}
-            onClick={() => {
-              const url = `/api/documents/download?type=invoice&orderId=${encodeURIComponent(node.id)}`;
-              window.open(url, "_blank");
-            }}
+            <ActionList
+              items={[
+                {
+                  content: 'Print Invoice',
+                  onAction: () => {
+                    togglePopover(node.id, 'print');
+                    navigate(`/app/invoice/${encodeURIComponent(node.id)}?print=true&type=invoice`);
+                  },
+                },
+                {
+                  content: 'Print Packing Slip',
+                  onAction: () => {
+                    togglePopover(node.id, 'print');
+                    navigate(`/app/invoice/${encodeURIComponent(node.id)}?print=true&type=packing-slip`);
+                  },
+                },
+              ]}
+            />
+          </Popover>
+          <Popover
+            active={activePopovers[`${node.id}-download`] || false}
+            activator={
+              <Button
+                size="slim"
+                icon={ImportIcon}
+                onClick={() => togglePopover(node.id, 'download')}
+                disclosure
+              >
+                Download
+              </Button>
+            }
+            onClose={() => togglePopover(node.id, 'download')}
           >
-            Download
-          </Button>
+            <ActionList
+              items={[
+                {
+                  content: 'Download Invoice',
+                  onAction: async () => {
+                    togglePopover(node.id, 'download');
+                    try {
+                      const url = `/api/documents/download?type=invoice&orderId=${encodeURIComponent(node.id)}&shop=${encodeURIComponent(shop)}`;
+                      const response = await fetch(url);
+                      if (!response.ok) throw new Error('Download failed');
+                      const blob = await response.blob();
+                      const blobUrl = URL.createObjectURL(blob);
+                      const link = document.createElement('a');
+                      link.href = blobUrl;
+                      link.download = `invoice-${node.name}.pdf`;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+                    } catch (err) {
+                      shopify.toast.show('Failed to download invoice');
+                    }
+                  },
+                },
+                {
+                  content: 'Download Packing Slip',
+                  onAction: async () => {
+                    togglePopover(node.id, 'download');
+                    try {
+                      const url = `/api/documents/download?type=packing-slip&orderId=${encodeURIComponent(node.id)}&shop=${encodeURIComponent(shop)}`;
+                      const response = await fetch(url);
+                      if (!response.ok) throw new Error('Download failed');
+                      const blob = await response.blob();
+                      const blobUrl = URL.createObjectURL(blob);
+                      const link = document.createElement('a');
+                      link.href = blobUrl;
+                      link.download = `packing-slip-${node.name}.pdf`;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+                    } catch (err) {
+                      shopify.toast.show('Failed to download packing slip');
+                    }
+                  },
+                },
+              ]}
+            />
+          </Popover>
           <Button
             size="slim"
             icon={EmailIcon}
             onClick={async () => {
-              const url = `/api/documents/send?type=invoice&orderId=${encodeURIComponent(node.id)}`;
+              const url = `/api/documents/send?type=invoice&orderId=${encodeURIComponent(node.id)}&shop=${encodeURIComponent(shop)}`;
               try {
                 const response = await fetch(url, { method: "POST" });
                 const data = await response.json();
