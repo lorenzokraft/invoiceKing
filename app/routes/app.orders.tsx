@@ -242,29 +242,6 @@ export default function OrdersPage() {
                 ]}
               />
             </Popover>
-            <Button
-              size="slim"
-              icon={EmailIcon}
-              onClick={async () => {
-                const url = `/api/documents/send?type=invoice&orderId=${encodeURIComponent(node.id)}&shop=${encodeURIComponent(shop)}`;
-                try {
-                  const response = await fetch(url, { method: "POST" });
-                  const data = await response.json();
-                  if (response.ok) {
-                    shopify.toast.show("Invoice sent successfully");
-                  } else {
-                    shopify.toast.show(data.error || "Failed to send invoice");
-                  }
-                } catch (err) {
-                  shopify.toast.show("Failed to send invoice");
-                }
-              }}
-            >
-              Send
-            </Button>
-            <Button size="slim" icon={UploadIcon}>
-              Upload
-            </Button>
           </ButtonGroup>
         </IndexTable.Cell>
       </IndexTable.Row>

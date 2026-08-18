@@ -3,7 +3,7 @@ import { json } from "@remix-run/node";
 import { useLoaderData, useSearchParams } from "@remix-run/react";
 import { useEffect } from "react";
 import { Page, Card, Button, InlineStack, BlockStack, Text } from "@shopify/polaris";
-import { PrintIcon, ImportIcon, EmailIcon } from "@shopify/polaris-icons";
+import { PrintIcon, ImportIcon } from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
@@ -278,21 +278,6 @@ export default function InvoiceViewPage() {
     }
   };
 
-  const handleSend = async () => {
-    const url = `/api/documents/send?type=invoice&orderId=${encodeURIComponent(order.id)}&shop=${encodeURIComponent(shop)}`;
-    try {
-      const response = await fetch(url, { method: "POST" });
-      const data = await response.json();
-      if (response.ok) {
-        shopify.toast.show("Invoice sent successfully");
-      } else {
-        shopify.toast.show(data.error || "Failed to send invoice");
-      }
-    } catch (err) {
-      shopify.toast.show("Failed to send invoice");
-    }
-  };
-
   const lineItems = order.lineItems.edges.map(({ node }: any) => ({
     title: node.title,
     quantity: node.quantity,
@@ -327,9 +312,6 @@ export default function InvoiceViewPage() {
                 </Button>
                 <Button icon={ImportIcon} onClick={handleDownload}>
                   Download
-                </Button>
-                <Button icon={EmailIcon} onClick={handleSend}>
-                  Send
                 </Button>
               </InlineStack>
             </InlineStack>
