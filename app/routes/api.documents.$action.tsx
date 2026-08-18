@@ -62,6 +62,9 @@ const DRAFT_ORDER_QUERY = `#graphql
             title
             quantity
             sku
+            image {
+              url
+            }
             originalUnitPriceSet {
               shopMoney {
                 amount
@@ -142,6 +145,9 @@ const ORDER_QUERY = `#graphql
             title
             quantity
             sku
+            image {
+              url
+            }
             originalUnitPriceSet {
               shopMoney {
                 amount
@@ -193,6 +199,7 @@ async function fetchOrderData(admin: any, orderId: string) {
       title: node.title,
       quantity: node.quantity,
       sku: node.sku || "",
+      image: node.image?.url || "",
       price: parseFloat(node.originalUnitPriceSet.shopMoney.amount).toFixed(2),
       total: parseFloat(node.originalTotalSet.shopMoney.amount).toFixed(2),
     })),

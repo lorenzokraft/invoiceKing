@@ -26,7 +26,6 @@ export default function App() {
         </Link>
         <Link to="/app/orders">Orders</Link>
         <Link to="/app/drafts">Drafts</Link>
-        <Link to="/app/credit-notes">Credit Notes</Link>
         <Link to="/app/templates">Templates</Link>
         <Link to="/app/settings">Settings</Link>
         <Link to="/app/plans">Select a Plan</Link>

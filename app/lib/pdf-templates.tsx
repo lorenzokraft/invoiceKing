@@ -128,11 +128,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#e1e3e5",
   },
-  colTitle: { width: "32%" },
+  colImage: { width: "50px" },
+  colTitle: { width: "28%" },
   colSku: { width: "14%" },
-  colQty: { width: "12%", textAlign: "center" },
-  colPrice: { width: "21%", textAlign: "right" },
-  colTotal: { width: "21%", textAlign: "right" },
+  colQty: { width: "10%", textAlign: "center" },
+  colPrice: { width: "19%", textAlign: "right" },
+  colTotal: { width: "19%", textAlign: "right" },
   totals: {
     marginTop: 20,
     alignItems: "flex-end",
@@ -240,6 +241,7 @@ interface OrderData {
     title: string;
     quantity: number;
     sku?: string;
+    image?: string;
     price: string;
     total: string;
   }>;
@@ -357,6 +359,7 @@ export const InvoiceTemplate: React.FC<{
             ? { borderBottomWidth: 1, borderBottomColor: "#1a1a1a" }
             : {},
         ]}>
+          <View style={styles.colImage} />
           <Text style={[styles.colTitle, { color: theme.headInk }]}>TITLE</Text>
           <Text style={[styles.colSku, { color: theme.headInk }]}>SKU</Text>
           <Text style={[styles.colQty, { color: theme.headInk }]}>QTY</Text>
@@ -365,6 +368,9 @@ export const InvoiceTemplate: React.FC<{
         </View>
         {data.lineItems.map((item, index) => (
           <View key={index} style={styles.tableRow}>
+            <View style={styles.colImage}>
+              {item.image && <Image src={item.image} style={{ width: 40, height: 40, objectFit: "cover" }} />}
+            </View>
             <Text style={styles.colTitle}>{item.title}</Text>
             <Text style={styles.colSku}>{item.sku || "—"}</Text>
             <Text style={styles.colQty}>{item.quantity}</Text>
@@ -519,6 +525,7 @@ export const PackingSlipTemplate: React.FC<{
             ? { borderBottomWidth: 1, borderBottomColor: "#1a1a1a" }
             : {},
         ]}>
+          <View style={styles.colImage} />
           <Text style={[styles.colTitle, { color: theme.headInk }]}>TITLE</Text>
           <Text style={[styles.colSku, { color: theme.headInk }]}>SKU</Text>
           <Text style={[styles.colQty, { color: theme.headInk }]}>QTY</Text>
@@ -527,6 +534,9 @@ export const PackingSlipTemplate: React.FC<{
         </View>
         {data.lineItems.map((item, index) => (
           <View key={index} style={styles.tableRow}>
+            <View style={styles.colImage}>
+              {item.image && <Image src={item.image} style={{ width: 40, height: 40, objectFit: "cover" }} />}
+            </View>
             <Text style={styles.colTitle}>{item.title}</Text>
             <Text style={styles.colSku}>{item.sku || "—"}</Text>
             <Text style={styles.colQty}>{item.quantity}</Text>

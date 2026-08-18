@@ -63,6 +63,9 @@ const DRAFT_ORDER_QUERY = `#graphql
             title
             quantity
             sku
+            image {
+              url
+            }
             originalUnitPriceSet {
               shopMoney {
                 amount
@@ -144,6 +147,9 @@ const ORDER_QUERY = `#graphql
             title
             quantity
             sku
+            image {
+              url
+            }
             originalUnitPriceSet {
               shopMoney {
                 amount
@@ -291,6 +297,7 @@ export default function InvoiceViewPage() {
     title: node.title,
     quantity: node.quantity,
     sku: node.sku || "—",
+    image: node.image?.url || "",
     price: parseFloat(node.originalUnitPriceSet.shopMoney.amount).toFixed(2),
     total: parseFloat(node.originalTotalSet.shopMoney.amount).toFixed(2),
   }));
@@ -505,6 +512,7 @@ export default function InvoiceViewPage() {
                       borderBottom: theme.headBg === "#ffffff" ? `2px solid ${theme.ink}` : "none",
                     }}
                   >
+                    <th style={{ padding: "12px", textAlign: "left", width: "60px" }}></th>
                     <th style={{ padding: "12px", textAlign: "left" }}>TITLE</th>
                     <th style={{ padding: "12px", textAlign: "left" }}>SKU</th>
                     <th style={{ padding: "12px", textAlign: "center" }}>QTY</th>
@@ -515,6 +523,15 @@ export default function InvoiceViewPage() {
                 <tbody>
                   {lineItems.map((item: any, index: number) => (
                     <tr key={index} style={{ borderBottom: "1px solid #e1e3e5" }}>
+                      <td style={{ padding: "12px" }}>
+                        {item.image && (
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "4px" }}
+                          />
+                        )}
+                      </td>
                       <td style={{ padding: "12px" }}>{item.title}</td>
                       <td style={{ padding: "12px" }}>{item.sku}</td>
                       <td style={{ padding: "12px", textAlign: "center" }}>{item.quantity}</td>
