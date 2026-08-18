@@ -165,14 +165,14 @@ export default function OrdersPage() {
                   {
                     content: 'Print Invoice',
                     onAction: () => {
-                      window.open(`/app/invoice/${encodeURIComponent(node.id)}?print=true&type=invoice`, '_blank');
+                      window.location.href = `/app/invoice/${encodeURIComponent(node.id)}?print=true&type=invoice`;
                       togglePopover(node.id, 'print');
                     },
                   },
                   {
                     content: 'Print Packing Slip',
                     onAction: () => {
-                      window.open(`/app/invoice/${encodeURIComponent(node.id)}?print=true&type=packing-slip`, '_blank');
+                      window.location.href = `/app/invoice/${encodeURIComponent(node.id)}?print=true&type=packing-slip`;
                       togglePopover(node.id, 'print');
                     },
                   },
@@ -197,16 +197,46 @@ export default function OrdersPage() {
                 items={[
                   {
                     content: 'Download Invoice',
-                    onAction: () => {
-                      window.open(`/app/document-action?id=${encodeURIComponent(node.id)}&type=invoice&mode=download`, '_blank');
+                    onAction: async () => {
                       togglePopover(node.id, 'download');
+                      try {
+                        const url = `/api/documents/download?type=invoice&orderId=${encodeURIComponent(node.id)}&shop=${encodeURIComponent(shop)}`;
+                        const response = await fetch(url);
+                        if (!response.ok) throw new Error('Download failed');
+                        const blob = await response.blob();
+                        const blobUrl = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = blobUrl;
+                        link.download = `invoice-${node.name}.pdf`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+                      } catch (err) {
+                        shopify.toast.show('Failed to download invoice');
+                      }
                     },
                   },
                   {
                     content: 'Download Packing Slip',
-                    onAction: () => {
-                      window.open(`/app/document-action?id=${encodeURIComponent(node.id)}&type=packing-slip&mode=download`, '_blank');
+                    onAction: async () => {
                       togglePopover(node.id, 'download');
+                      try {
+                        const url = `/api/documents/download?type=packing-slip&orderId=${encodeURIComponent(node.id)}&shop=${encodeURIComponent(shop)}`;
+                        const response = await fetch(url);
+                        if (!response.ok) throw new Error('Download failed');
+                        const blob = await response.blob();
+                        const blobUrl = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = blobUrl;
+                        link.download = `packing-slip-${node.name}.pdf`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+                      } catch (err) {
+                        shopify.toast.show('Failed to download packing slip');
+                      }
                     },
                   },
                 ]}
