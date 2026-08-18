@@ -129,9 +129,10 @@ const styles = StyleSheet.create({
     borderBottomColor: "#e1e3e5",
   },
   colImage: { width: "50px" },
-  colTitle: { width: "28%" },
+  colTitle: { width: "24%" },
   colSku: { width: "14%" },
-  colQty: { width: "10%", textAlign: "center" },
+  colQty: { width: "8%", textAlign: "center" },
+  colTax: { width: "8%", textAlign: "right" },
   colPrice: { width: "19%", textAlign: "right" },
   colTotal: { width: "19%", textAlign: "right" },
   totals: {
@@ -242,6 +243,8 @@ interface OrderData {
     quantity: number;
     sku?: string;
     image?: string;
+    tax?: string;
+    taxRate?: number;
     price: string;
     total: string;
   }>;
@@ -363,6 +366,7 @@ export const InvoiceTemplate: React.FC<{
           <Text style={[styles.colTitle, { color: theme.headInk }]}>TITLE</Text>
           <Text style={[styles.colSku, { color: theme.headInk }]}>SKU</Text>
           <Text style={[styles.colQty, { color: theme.headInk }]}>QTY</Text>
+          <Text style={[styles.colTax, { color: theme.headInk }]}>TAX</Text>
           <Text style={[styles.colPrice, { color: theme.headInk }]}>UNIT PRICE</Text>
           <Text style={[styles.colTotal, { color: theme.headInk }]}>TOTAL</Text>
         </View>
@@ -374,6 +378,9 @@ export const InvoiceTemplate: React.FC<{
             <Text style={styles.colTitle}>{item.title}</Text>
             <Text style={styles.colSku}>{item.sku || "—"}</Text>
             <Text style={styles.colQty}>{item.quantity}</Text>
+            <Text style={styles.colTax}>
+              {item.taxRate ? `${Math.round(item.taxRate * 100)}%` : "—"}
+            </Text>
             <Text style={styles.colPrice}>
               {data.currency} {item.price}
             </Text>
@@ -529,6 +536,7 @@ export const PackingSlipTemplate: React.FC<{
           <Text style={[styles.colTitle, { color: theme.headInk }]}>TITLE</Text>
           <Text style={[styles.colSku, { color: theme.headInk }]}>SKU</Text>
           <Text style={[styles.colQty, { color: theme.headInk }]}>QTY</Text>
+          <Text style={[styles.colTax, { color: theme.headInk }]}>TAX</Text>
           <Text style={[styles.colPrice, { color: theme.headInk }]}>UNIT PRICE</Text>
           <Text style={[styles.colTotal, { color: theme.headInk }]}>TOTAL</Text>
         </View>
@@ -540,6 +548,9 @@ export const PackingSlipTemplate: React.FC<{
             <Text style={styles.colTitle}>{item.title}</Text>
             <Text style={styles.colSku}>{item.sku || "—"}</Text>
             <Text style={styles.colQty}>{item.quantity}</Text>
+            <Text style={styles.colTax}>
+              {item.taxRate ? `${Math.round(item.taxRate * 100)}%` : "—"}
+            </Text>
             <Text style={styles.colPrice}>
               {data.currency} {item.price}
             </Text>

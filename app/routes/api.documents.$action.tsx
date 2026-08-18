@@ -65,6 +65,15 @@ const DRAFT_ORDER_QUERY = `#graphql
             image {
               url
             }
+            taxLines {
+              rate
+              title
+              priceSet {
+                shopMoney {
+                  amount
+                }
+              }
+            }
             originalUnitPriceSet {
               shopMoney {
                 amount
@@ -148,6 +157,15 @@ const ORDER_QUERY = `#graphql
             image {
               url
             }
+            taxLines {
+              rate
+              title
+              priceSet {
+                shopMoney {
+                  amount
+                }
+              }
+            }
             originalUnitPriceSet {
               shopMoney {
                 amount
@@ -200,6 +218,10 @@ async function fetchOrderData(admin: any, orderId: string) {
       quantity: node.quantity,
       sku: node.sku || "",
       image: node.image?.url || "",
+      tax: node.taxLines?.length
+        ? parseFloat(node.taxLines[0].priceSet.shopMoney.amount).toFixed(2)
+        : "0.00",
+      taxRate: node.taxLines?.length ? node.taxLines[0].rate : 0,
       price: parseFloat(node.originalUnitPriceSet.shopMoney.amount).toFixed(2),
       total: parseFloat(node.originalTotalSet.shopMoney.amount).toFixed(2),
     })),

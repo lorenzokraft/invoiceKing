@@ -66,6 +66,15 @@ const DRAFT_ORDER_QUERY = `#graphql
             image {
               url
             }
+            taxLines {
+              rate
+              title
+              priceSet {
+                shopMoney {
+                  amount
+                }
+              }
+            }
             originalUnitPriceSet {
               shopMoney {
                 amount
@@ -149,6 +158,15 @@ const ORDER_QUERY = `#graphql
             sku
             image {
               url
+            }
+            taxLines {
+              rate
+              title
+              priceSet {
+                shopMoney {
+                  amount
+                }
+              }
             }
             originalUnitPriceSet {
               shopMoney {
@@ -283,6 +301,10 @@ export default function InvoiceViewPage() {
     quantity: node.quantity,
     sku: node.sku || "—",
     image: node.image?.url || "",
+    tax: node.taxLines?.length
+      ? parseFloat(node.taxLines[0].priceSet.shopMoney.amount).toFixed(2)
+      : "0.00",
+    taxRate: node.taxLines?.length ? node.taxLines[0].rate : 0,
     price: parseFloat(node.originalUnitPriceSet.shopMoney.amount).toFixed(2),
     total: parseFloat(node.originalTotalSet.shopMoney.amount).toFixed(2),
   }));
@@ -498,6 +520,7 @@ export default function InvoiceViewPage() {
                     <th style={{ padding: "12px", textAlign: "left" }}>TITLE</th>
                     <th style={{ padding: "12px", textAlign: "left" }}>SKU</th>
                     <th style={{ padding: "12px", textAlign: "center" }}>QTY</th>
+                    <th style={{ padding: "12px", textAlign: "right" }}>TAX</th>
                     <th style={{ padding: "12px", textAlign: "right" }}>UNIT PRICE</th>
                     <th style={{ padding: "12px", textAlign: "right" }}>TOTAL</th>
                   </tr>
@@ -517,6 +540,9 @@ export default function InvoiceViewPage() {
                       <td style={{ padding: "12px" }}>{item.title}</td>
                       <td style={{ padding: "12px" }}>{item.sku}</td>
                       <td style={{ padding: "12px", textAlign: "center" }}>{item.quantity}</td>
+                      <td style={{ padding: "12px", textAlign: "right" }}>
+                        {item.taxRate ? `${Math.round(item.taxRate * 100)}%` : "—"}
+                      </td>
                       <td style={{ padding: "12px", textAlign: "right" }}>
                         {currency} {item.price}
                       </td>
