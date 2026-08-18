@@ -14,6 +14,8 @@ import {
   Pagination,
   Banner,
   Icon,
+  Popover,
+  ActionList,
 } from "@shopify/polaris";
 import {
   PrintIcon,
@@ -64,10 +66,18 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
 };
 
+import { useState } from "react";
+
 export default function OrdersPage() {
   const { orders, pageInfo, error, shop } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
   const searchQuery = searchParams.get("q") || "";
+  const [activePopovers, setActivePopovers] = useState<Record<string, boolean>>({});
+
+  const togglePopover = (orderId: string, type: 'print' | 'download') => {
+    const key = `${orderId}-${type}`;
+    setActivePopovers(prev => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const resourceName = {
     singular: "order",
@@ -136,28 +146,72 @@ export default function OrdersPage() {
         </IndexTable.Cell>
         <IndexTable.Cell>
           <ButtonGroup>
-            <Button
-              size="slim"
-              icon={PrintIcon}
-              url={`/app/invoice/${encodeURIComponent(node.id)}?print=true`}
+            <Popover
+              active={activePopovers[`${node.id}-print`] || false}
+              activator={
+                <Button
+                  size="slim"
+                  icon={PrintIcon}
+                  onClick={() => togglePopover(node.id, 'print')}
+                  disclosure
+                >
+                  Print
+                </Button>
+              }
+              onClose={() => togglePopover(node.id, 'print')}
             >
-              Print
-            </Button>
-            <Button
-              size="slim"
-              icon={ImportIcon}
-              onClick={() => {
-                const form = document.createElement('form');
-                form.method = 'GET';
-                form.action = `/api/documents/download?type=invoice&orderId=${encodeURIComponent(node.id)}&shop=${encodeURIComponent(shop)}`;
-                form.target = '_blank';
-                document.body.appendChild(form);
-                form.submit();
-                document.body.removeChild(form);
-              }}
+              <ActionList
+                items={[
+                  {
+                    content: 'Print Invoice',
+                    onAction: () => {
+                      window.open(`/app/invoice/${encodeURIComponent(node.id)}?print=true&type=invoice`, '_blank');
+                      togglePopover(node.id, 'print');
+                    },
+                  },
+                  {
+                    content: 'Print Packing Slip',
+                    onAction: () => {
+                      window.open(`/app/invoice/${encodeURIComponent(node.id)}?print=true&type=packing-slip`, '_blank');
+                      togglePopover(node.id, 'print');
+                    },
+                  },
+                ]}
+              />
+            </Popover>
+            <Popover
+              active={activePopovers[`${node.id}-download`] || false}
+              activator={
+                <Button
+                  size="slim"
+                  icon={ImportIcon}
+                  onClick={() => togglePopover(node.id, 'download')}
+                  disclosure
+                >
+                  Download
+                </Button>
+              }
+              onClose={() => togglePopover(node.id, 'download')}
             >
-              Download
-            </Button>
+              <ActionList
+                items={[
+                  {
+                    content: 'Download Invoice',
+                    onAction: () => {
+                      window.open(`/app/document-action?id=${encodeURIComponent(node.id)}&type=invoice&mode=download`, '_blank');
+                      togglePopover(node.id, 'download');
+                    },
+                  },
+                  {
+                    content: 'Download Packing Slip',
+                    onAction: () => {
+                      window.open(`/app/document-action?id=${encodeURIComponent(node.id)}&type=packing-slip&mode=download`, '_blank');
+                      togglePopover(node.id, 'download');
+                    },
+                  },
+                ]}
+              />
+            </Popover>
             <Button
               size="slim"
               icon={EmailIcon}

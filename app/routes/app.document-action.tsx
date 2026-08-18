@@ -53,7 +53,7 @@ export default function DocumentActionPage() {
   const numericOrderId = orderId.replace(/^gid:\/\/shopify\/Order\//, "");
   const orderAdminUrl = `https://admin.shopify.com/store/${storeHandle}/orders/${numericOrderId}`;
 
-  const typeLabel = type === "invoice" ? "Invoice" : "Packing Slip";
+  const typeLabel = type === "invoice" ? "Invoice" : type === "packing-slip" ? "Packing Slip" : "Document";
 
   const goBackToOrder = useCallback(() => {
     window.open(orderAdminUrl, "_top");
@@ -72,7 +72,8 @@ export default function DocumentActionPage() {
 
   const runAction = useCallback(async () => {
     try {
-      const apiUrl = `/api/documents/${mode}?type=${encodeURIComponent(type)}&orderId=${encodeURIComponent(orderId)}&shop=${encodeURIComponent(shop)}`;
+      const docType = type === "packing-slip" ? "packing-slip" : "invoice";
+      const apiUrl = `/api/documents/${mode}?type=${encodeURIComponent(docType)}&orderId=${encodeURIComponent(orderId)}&shop=${encodeURIComponent(shop)}`;
       const response = await fetch(apiUrl);
 
       if (!response.ok) {

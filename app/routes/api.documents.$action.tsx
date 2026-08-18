@@ -281,8 +281,8 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
   const orderData = await fetchOrderData(admin, orderId);
 
-  const documentType: DocumentType =
-    type === "invoice" ? "INVOICE" : "PACKING_SLIP";
+  const isPacking = type === "packing-slip" || type === "packing_slip";
+  const documentType: DocumentType = isPacking ? "PACKING_SLIP" : "INVOICE";
   const documentStatus: DocumentStatus =
     action === "print" ? "COMPLETED" : "OPEN";
 
@@ -306,12 +306,10 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     orderName: orderData.orderNumber,
   });
 
-  const Template =
-    type === "invoice" ? InvoiceTemplate : PackingSlipTemplate;
-  const filename =
-    type === "invoice"
-      ? `invoice-${orderData.orderNumber}.pdf`
-      : `packing-slip-${orderData.orderNumber}.pdf`;
+  const Template = isPacking ? PackingSlipTemplate : InvoiceTemplate;
+  const filename = isPacking
+    ? `packing-slip-${orderData.orderNumber}.pdf`
+    : `invoice-${orderData.orderNumber}.pdf`;
 
   const templateSettings = await loadTemplateSettings(shop, type);
   
